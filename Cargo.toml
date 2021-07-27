@@ -1,23 +1,18 @@
 [package]
-name = "fretboard_layout"
-version = "0.1.1"
+name = "rgba_simple"
+version = "0.1.0"
 authors = ["Nathan Fisher <nfisher.sr@gmail.com>"]
 edition = "2018"
 license-file = "LICENSE"
-description = "Generate an svg template of a musical instrument fretboard"
-repository = "https://codeberg.org/jeang3nie/fretboard-layout"
-keywords = ["graphics", "design", "vector-graphics", "lutherie"]
-categories = ["graphics", "multimedia::images", "mathematics", "simulation"]
+description = "Simple RGBA and Hex color representation"
+repository = "https://codeberg.org/jeang3nie/rgba_simple"
+keywords = ["graphics", "color", "rgba"]
+categories = ["graphics", "multimedia::images"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-svg = "~0.10"
 hex ="~0.4"
-
-[dependencies.rug]
-version = "~1.12"
-features = ["float"]
 
 [dependencies.serde]
 version = "~1.0"
