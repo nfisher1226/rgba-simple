@@ -1,7 +1,7 @@
 #![warn(clippy::all, clippy::pedantic)]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "gdk")]
-use gdk;
+#[cfg(feature = "gtk")]
+use gtk::gdk;
 /// This struct contains a color represented in hex notation plus an opacity
 /// value. This is necessary to represent colors in an SVG image
 #[derive(Clone, Deserialize, Debug, Serialize)]
@@ -50,7 +50,7 @@ impl Color {
         }
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     pub fn to_gdk(&self) -> Option<gdk::RGBA> {
         match self {
             Color::Hex(c) => c.to_gdk(),
@@ -81,7 +81,7 @@ impl HexColor {
         }
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     pub fn to_gdk(&self) -> Option<gdk::RGBA> {
         if let Some(color) = self.to_reduced() {
             Some(color.to_gdk())
@@ -143,23 +143,23 @@ impl ReducedRGBA {
         }
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     pub fn to_gdk(&self) -> gdk::RGBA {
         gdk::RGBA {
-            red: self.red as f64 / 255.0,
-            green: self.green as f64 / 255.0,
-            blue: self.blue as f64 / 255.0,
-            alpha: self.alpha as f64 / 255.0,
+            red: self.red as f32 / 255.0,
+            green: self.green as f32 / 255.0,
+            blue: self.blue as f32 / 255.0,
+            alpha: self.alpha as f32 / 255.0,
         }
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     pub fn from_gdk(color: &gdk::RGBA) -> ReducedRGBA {
         RGBA {
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
-            alpha: color.alpha,
+            red: color.red as f64,
+            green: color.green as f64,
+            blue: color.blue as f64,
+            alpha: color.alpha as f64,
         }.to_reduced()
     }
 
@@ -234,23 +234,23 @@ impl RGBA {
         }
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     pub fn to_gdk(&self) -> gdk::RGBA {
         gdk::RGBA {
-            red: self.red,
-            green: self.green,
-            blue: self.blue,
-            alpha: self.alpha,
+            red: self.red as f32,
+            green: self.green as f32,
+            blue: self.blue as f32,
+            alpha: self.alpha as f32,
         }
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     pub fn from_gdk(color: &gdk::RGBA) -> RGBA {
         RGBA {
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
-            alpha: color.alpha,
+            red: color.red as f64,
+            green: color.green as f64,
+            blue: color.blue as f64,
+            alpha: color.alpha as f64,
         }
     }
 
@@ -379,7 +379,7 @@ mod tests {
         assert_eq!(red.alpha, 255);
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     #[test]
     fn rgba_to_gdk() {
         let red = RGBA::red();
@@ -390,7 +390,7 @@ mod tests {
         assert_eq!(red.alpha, gdk_red.alpha);
     }
 
-    #[cfg(feature = "gdk")]
+    #[cfg(feature = "gtk")]
     #[test]
     fn rgba_from_gdk() {
         let gdk_red = gdk::RGBA {
