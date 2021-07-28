@@ -7,17 +7,17 @@ use gtk::gdk;
 #[derive(Clone, Deserialize, Debug, Serialize)]
 pub struct HexColor {
     pub color: String,
-    pub alpha: f64,
+    pub alpha: f32,
 }
 
 /// This struct represents colors in floating point precision as separate
 /// Red, Green, and Blue channels plus a separate Alpha (Opacity) channel
 #[derive(Clone, Deserialize, Debug, Serialize)]
 pub struct RGBA {
-    pub red: f64,
-    pub green: f64,
-    pub blue: f64,
-    pub alpha: f64,
+    pub red: f32,
+    pub green: f32,
+    pub blue: f32,
+    pub alpha: f32,
 }
 
 /// This struct represents colors in 8-bit precision as separate
@@ -130,16 +130,16 @@ impl ReducedRGBA {
     pub fn to_hex(&self) -> HexColor {
         HexColor {
             color: format!("#{:02x}{:02x}{:02x}", self.red, self.green, self.blue,),
-            alpha: self.alpha as f64 / 255.0,
+            alpha: self.alpha as f32 / 255.0,
         }
     }
 
     pub fn to_rgba(&self) -> RGBA {
         RGBA {
-            red: self.red as f64 / 255.0,
-            green: self.green as f64 / 255.0,
-            blue: self.blue as f64 / 255.0,
-            alpha: self.alpha as f64 / 255.0,
+            red: self.red as f32 / 255.0,
+            green: self.green as f32 / 255.0,
+            blue: self.blue as f32 / 255.0,
+            alpha: self.alpha as f32 / 255.0,
         }
     }
 
@@ -156,10 +156,10 @@ impl ReducedRGBA {
     #[cfg(feature = "gtk")]
     pub fn from_gdk(color: &gdk::RGBA) -> ReducedRGBA {
         RGBA {
-            red: color.red as f64,
-            green: color.green as f64,
-            blue: color.blue as f64,
-            alpha: color.alpha as f64,
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+            alpha: color.alpha,
         }.to_reduced()
     }
 
@@ -237,20 +237,20 @@ impl RGBA {
     #[cfg(feature = "gtk")]
     pub fn to_gdk(&self) -> gdk::RGBA {
         gdk::RGBA {
-            red: self.red as f32,
-            green: self.green as f32,
-            blue: self.blue as f32,
-            alpha: self.alpha as f32,
+            red: self.red,
+            green: self.green,
+            blue: self.blue,
+            alpha: self.alpha,
         }
     }
 
     #[cfg(feature = "gtk")]
     pub fn from_gdk(color: &gdk::RGBA) -> RGBA {
         RGBA {
-            red: color.red as f64,
-            green: color.green as f64,
-            blue: color.blue as f64,
-            alpha: color.alpha as f64,
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+            alpha: color.alpha,
         }
     }
 
