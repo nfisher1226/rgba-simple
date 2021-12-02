@@ -2,7 +2,7 @@
 name = "rgba_simple"
 version = "0.1.0"
 authors = ["Nathan Fisher <nfisher.sr@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license-file = "LICENSE"
 description = "Simple RGBA and Hex color representation"
 repository = "https://codeberg.org/jeang3nie/rgba_simple"
