@@ -19,7 +19,7 @@ version = "~1.0"
 features = ["derive"]
 
 [dependencies.gtk]
-version = "~0.2"
+version = "~0.3"
 package = "gtk4"
 optional = true
 
