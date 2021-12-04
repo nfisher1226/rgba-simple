@@ -1,7 +1,7 @@
 #![warn(clippy::all, clippy::pedantic)]
-use serde::{Deserialize, Serialize};
 #[cfg(feature = "gtk")]
 use gtk::gdk;
+use serde::{Deserialize, Serialize};
 /// This struct contains a color represented in hex notation plus an opacity
 /// value. This is necessary to represent colors in an SVG image
 #[derive(Clone, Deserialize, Debug, Serialize)]
@@ -160,7 +160,8 @@ impl ReducedRGBA {
             green: color.green,
             blue: color.blue,
             alpha: color.alpha,
-        }.to_reduced()
+        }
+        .to_reduced()
     }
 
     pub fn black() -> ReducedRGBA {
@@ -228,9 +229,9 @@ impl RGBA {
     pub fn to_reduced(&self) -> ReducedRGBA {
         ReducedRGBA {
             red: (self.red * 255.0) as u8,
-            green: (self.green* 255.0) as u8,
-            blue: (self.blue* 255.0) as u8,
-            alpha: (self.alpha* 255.0) as u8,
+            green: (self.green * 255.0) as u8,
+            blue: (self.blue * 255.0) as u8,
+            alpha: (self.alpha * 255.0) as u8,
         }
     }
 
@@ -371,7 +372,10 @@ mod tests {
 
     #[test]
     fn from_hex() {
-        let red_hex = HexColor { color: String::from("#ff0000"), alpha: 1.0 };
+        let red_hex = HexColor {
+            color: String::from("#ff0000"),
+            alpha: 1.0,
+        };
         let red = red_hex.to_reduced().unwrap();
         assert_eq!(red.red, 255);
         assert_eq!(red.green, 0);
