@@ -43,7 +43,7 @@ impl Color {
         match self {
             Color::Hex(c) => HexColor {
                 color: c.color.clone(),
-                alpha: c.alpha.clone(),
+                alpha: c.alpha,
             },
             Color::Rgba(c) => c.to_hex(),
             Color::Reduced(c) => c.to_hex(),
@@ -74,11 +74,7 @@ impl HexColor {
     }
 
     pub fn to_rgba(&self) -> Option<RGBA> {
-        if let Some(color) = self.to_reduced() {
-            Some(color.to_rgba())
-        } else {
-            None
-        }
+        self.to_reduced().map(|color| color.to_rgba())
     }
 
     #[cfg(feature = "gtk")]
@@ -136,20 +132,20 @@ impl ReducedRGBA {
 
     pub fn to_rgba(&self) -> RGBA {
         RGBA {
-            red: self.red as f32 / 255.0,
-            green: self.green as f32 / 255.0,
-            blue: self.blue as f32 / 255.0,
-            alpha: self.alpha as f32 / 255.0,
+            red: f32::from(self.red) / 255.0,
+            green: f32::from(self.green) / 255.0,
+            blue: f32::from(self.blue) / 255.0,
+            alpha: f32::from(self.alpha) / 255.0,
         }
     }
 
     #[cfg(feature = "gtk")]
     pub fn to_gdk(&self) -> gdk::RGBA {
         gdk::RGBA {
-            red: self.red as f32 / 255.0,
-            green: self.green as f32 / 255.0,
-            blue: self.blue as f32 / 255.0,
-            alpha: self.alpha as f32 / 255.0,
+            red: f32::from(self.red) / 255.0,
+            green: f32::from(self.green) / 255.0,
+            blue: f32::from(self.blue) / 255.0,
+            alpha: f32::from(self.alpha) / 255.0,
         }
     }
 
