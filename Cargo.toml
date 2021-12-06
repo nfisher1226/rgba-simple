@@ -12,7 +12,11 @@ categories = ["graphics", "multimedia::images"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hex ="~0.4"
+
+[dependencies.hex]
+version = "~0.4"
+default-features = false
+features = ["std"]
 
 [dependencies.serde]
 version = "~1.0"
