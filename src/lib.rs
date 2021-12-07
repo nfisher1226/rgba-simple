@@ -146,7 +146,7 @@ pub trait FromGdk {
 
 #[cfg(feature = "gtk")]
 impl ToGdk for ReducedRGBA {
-    pub fn to_gdk(&self) -> gdk::RGBA {
+    fn to_gdk(&self) -> gdk::RGBA {
         gdk::RGBA {
             red: f32::from(self.red) / 255.0,
             green: f32::from(self.green) / 255.0,
