@@ -9,6 +9,7 @@
 #[cfg(feature = "gtk")]
 use gtk::gdk;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// This struct contains a color represented in hex notation plus an opacity
 /// value. This is necessary to represent colors in an SVG image
@@ -50,6 +51,12 @@ pub enum Color {
 pub enum ColorBoundsError {
     Negative,
     High,
+}
+
+impl fmt::Display for ColorBoundsError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 pub trait ToHex {
