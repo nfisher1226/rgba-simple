@@ -19,10 +19,15 @@ impl Convert for RGBA {
     /// Converts an [RGBA] color (red, green, blue plus alpha) to a struct
     /// containing a hex color string and an opacity value, suitable for
     /// embedding into an svg image
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_hex(&self) -> Result<HexColor, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue> 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(HexColor {
@@ -37,20 +42,29 @@ impl Convert for RGBA {
         }
     }
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     fn to_rgba(&self) -> Result<Self, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(self.clone())
         }
     }
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(ReducedRGBA {
@@ -62,11 +76,15 @@ impl Convert for RGBA {
         }
     }
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     #[cfg(feature = "gtk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(gdk::RGBA {

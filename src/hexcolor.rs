@@ -15,7 +15,7 @@ impl Convert for HexColor {
     type Err = ColorError;
 
     fn to_hex(&self) -> Result<Self, Self::Err> {
-        if let Ok(_) = self.to_reduced_rgba() {
+        if self.to_reduced_rgba().is_ok() {
             Ok(self.clone())
         } else {
             Err(ColorError::InvalidHex)
@@ -30,6 +30,7 @@ impl Convert for HexColor {
         }
     }
 
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
         if let Ok(buf) = hex::decode(&self.color[1..]) {
             Ok(ReducedRGBA {

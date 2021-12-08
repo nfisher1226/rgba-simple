@@ -4,10 +4,14 @@ use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, RGBA};
 impl Convert for gdk::RGBA {
     type Err = ColorError;
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     fn to_hex(&self) -> Result<HexColor, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(HexColor {
@@ -22,10 +26,14 @@ impl Convert for gdk::RGBA {
         }
     }
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     fn to_rgba(&self) -> Result<RGBA, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(RGBA {
@@ -37,10 +45,14 @@ impl Convert for gdk::RGBA {
         }
     }
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(ReducedRGBA {
@@ -52,10 +64,14 @@ impl Convert for gdk::RGBA {
         }
     }
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     fn to_gdk(&self) -> Result<Self, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(self.clone())

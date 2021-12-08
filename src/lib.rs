@@ -43,8 +43,19 @@ impl fmt::Display for ColorError {
 
 pub trait Convert {
     type Err;
+    /// # Errors
+    ///
+    /// Will return `ColorError` if hex conversion fails
     fn to_hex(&self) -> Result<HexColor, Self::Err>;
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     fn to_rgba(&self) -> Result<RGBA, Self::Err>;
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err>;
     #[cfg(feature = "gtk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
@@ -63,6 +74,9 @@ pub trait Primary {
 
 pub trait ToHex {
     type Err;
+    /// # Errors
+    ///
+    /// Will return `ColorError` if hex conversion fails
     fn to_hex(&self) -> Result<HexColor, Self::Err>;
 }
 
@@ -79,20 +93,6 @@ impl ToHex for Color {
             Color::Reduced(c) => c.to_hex(),
         }
     }
-}
-
-pub trait ToRGBA {
-    fn to_rgba(&self) -> RGBA;
-}
-
-pub trait ToReducedRGBA {
-    type Err;
-    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err>;
-}
-
-#[cfg(feature = "gtk")]
-pub trait ToGdk {
-    fn to_gdk(&self) -> gdk::RGBA;
 }
 
 impl Color {

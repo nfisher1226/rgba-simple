@@ -19,7 +19,7 @@ impl Convert for ReducedRGBA {
     fn to_hex(&self) -> Result<HexColor, Self::Err> {
         Ok(HexColor {
             color: format!("#{:02x}{:02x}{:02x}", self.red, self.green, self.blue,),
-            alpha: self.alpha as f32 / 255.0,
+            alpha: f32::from(self.alpha) / 255.0,
         })
     }
 
@@ -32,6 +32,7 @@ impl Convert for ReducedRGBA {
         })
     }
 
+    #[allow(clippy::cast_sign_loss)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
         Ok(self.clone())
     }
