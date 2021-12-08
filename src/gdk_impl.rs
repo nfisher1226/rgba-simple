@@ -8,6 +8,7 @@ impl Convert for gdk::RGBA {
     ///
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_hex(&self) -> Result<HexColor, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
@@ -37,10 +38,10 @@ impl Convert for gdk::RGBA {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(RGBA {
-                red: self.red.clone(),
-                green: self.green.clone(),
-                blue: self.blue.clone(),
-                alpha: self.alpha.clone(),
+                red: self.red,
+                green: self.green,
+                blue: self.blue,
+                alpha: self.alpha,
             })
         }
     }
@@ -49,6 +50,7 @@ impl Convert for gdk::RGBA {
     ///
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
         if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
             Err(ColorError::OutsideBoundsNegative)
@@ -74,7 +76,7 @@ impl Convert for gdk::RGBA {
         } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
-            Ok(self.clone())
+            Ok(*self)
         }
     }
 }

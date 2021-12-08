@@ -15,15 +15,23 @@ impl Convert for HexColor {
     type Err = ColorError;
 
     fn to_hex(&self) -> Result<Self, Self::Err> {
-        if self.to_reduced_rgba().is_ok() {
-            Ok(self.clone())
-        } else {
+        if self.to_reduced_rgba().is_err() {
             Err(ColorError::InvalidHex)
+        } else if self.alpha < 0.0 {
+            Err(ColorError::OutsideBoundsNegative)
+        } else if self.alpha > 1.0 {
+            Err(ColorError::OutsideBoundsHigh)
+        } else {
+            Ok(self.clone())
         }
     }
 
     fn to_rgba(&self) -> Result<RGBA, Self::Err> {
-        if let Ok(color) = self.to_reduced_rgba() {
+        if self.alpha < 0.0 {
+            Err(ColorError::OutsideBoundsNegative)
+        } else if self.alpha > 1.0 {
+            Err(ColorError::OutsideBoundsHigh)
+        } else if let Ok(color) = self.to_reduced_rgba() {
             color.to_rgba()
         } else {
             Err(ColorError::InvalidHex)
@@ -32,7 +40,11 @@ impl Convert for HexColor {
 
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
-        if let Ok(buf) = hex::decode(&self.color[1..]) {
+        if self.alpha < 0.0 {
+            Err(ColorError::OutsideBoundsNegative)
+        } else if self.alpha > 1.0 {
+            Err(ColorError::OutsideBoundsHigh)
+        } else if let Ok(buf) = hex::decode(&self.color[1..]) {
             Ok(ReducedRGBA {
                 red: buf[0],
                 green: buf[1],
@@ -46,7 +58,11 @@ impl Convert for HexColor {
 
     #[cfg(feature = "gtk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
-        if let Ok(color) = self.to_reduced_rgba() {
+        if self.alpha < 0.0 {
+            Err(ColorError::OutsideBoundsNegative)
+        } else if self.alpha > 1.0 {
+            Err(ColorError::OutsideBoundsHigh)
+        } else if let Ok(color) = self.to_reduced_rgba() {
             color.to_gdk()
         } else {
             Err(ColorError::InvalidHex)

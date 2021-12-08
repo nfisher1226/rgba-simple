@@ -45,7 +45,8 @@ pub trait Convert {
     type Err;
     /// # Errors
     ///
-    /// Will return `ColorError` if hex conversion fails
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0 or if hex conversion fails
     fn to_hex(&self) -> Result<HexColor, Self::Err>;
     /// # Errors
     ///
@@ -57,6 +58,10 @@ pub trait Convert {
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err>;
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
     #[cfg(feature = "gtk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
 }
@@ -72,32 +77,35 @@ pub trait Primary {
     fn cyan() -> Self;
 }
 
-pub trait ToHex {
-    type Err;
-    /// # Errors
-    ///
-    /// Will return `ColorError` if hex conversion fails
-    fn to_hex(&self) -> Result<HexColor, Self::Err>;
-}
-
-impl ToHex for Color {
+impl Convert for Color {
     type Err = ColorError;
 
-    fn to_hex(&self) -> Result<HexColor, ColorError> {
+    fn to_hex(&self) -> Result<HexColor, Self::Err> {
         match self {
-            Color::Hex(c) => Ok(HexColor {
-                color: c.color.clone(),
-                alpha: c.alpha,
-            }),
+            Color::Hex(c) => c.to_hex(),
             Color::Rgba(c) => c.to_hex(),
             Color::Reduced(c) => c.to_hex(),
         }
     }
-}
 
-impl Color {
+    fn to_rgba(&self) -> Result<RGBA, Self::Err> {
+        match self {
+            Color::Hex(c) => c.to_rgba(),
+            Color::Rgba(c) => c.to_rgba(),
+            Color::Reduced(c) => c.to_rgba(),
+        }
+    }
+
+    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
+        match self {
+            Color::Hex(c) => c.to_reduced_rgba(),
+            Color::Rgba(c) => c.to_reduced_rgba(),
+            Color::Reduced(c) => c.to_reduced_rgba(),
+        }
+    }
+
     #[cfg(feature = "gtk")]
-    pub fn to_gdk(&self) -> Result<gdk::RGBA, ColorError> {
+    fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
         match self {
             Color::Hex(c) => c.to_gdk(),
             Color::Rgba(c) => c.to_gdk(),
