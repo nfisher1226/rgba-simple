@@ -11,33 +11,14 @@ use gtk::gdk;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-/// This struct contains a color represented in hex notation plus an opacity
-/// value. This is necessary to represent colors in an SVG image
-#[derive(Clone, Deserialize, Debug, Serialize)]
-pub struct HexColor {
-    pub color: String,
-    pub alpha: f32,
-}
-
-/// This struct represents colors in floating point precision as separate
-/// Red, Green, and Blue channels plus a separate Alpha (Opacity) channel
-#[derive(Clone, Deserialize, Debug, Serialize)]
-pub struct RGBA {
-    pub red: f32,
-    pub green: f32,
-    pub blue: f32,
-    pub alpha: f32,
-}
-
-/// This struct represents colors in 8-bit precision as separate
-/// Red, Green, and Blue channels
-#[derive(Clone, Deserialize, Debug, Serialize)]
-pub struct ReducedRGBA {
-    pub red: u8,
-    pub green: u8,
-    pub blue: u8,
-    pub alpha: u8,
-}
+pub mod hexcolor;
+pub use hexcolor::HexColor;
+pub mod reduced;
+pub use reduced::ReducedRGBA;
+pub mod rgba;
+pub use rgba::RGBA;
+#[cfg(feature = "gtk")]
+pub mod gdk_impl;
 
 #[derive(Clone, Deserialize, Debug, Serialize)]
 #[serde(tag = "ColorType")]
@@ -48,15 +29,36 @@ pub enum Color {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum ColorBoundsError {
-    Negative,
-    High,
+pub enum ColorError {
+    OutsideBoundsNegative,
+    OutsideBoundsHigh,
+    InvalidHex,
 }
 
-impl fmt::Display for ColorBoundsError {
+impl fmt::Display for ColorError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
     }
+}
+
+pub trait Convert {
+    type Err;
+    fn to_hex(&self) -> Result<HexColor, Self::Err>;
+    fn to_rgba(&self) -> Result<RGBA, Self::Err>;
+    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err>;
+    #[cfg(feature = "gtk")]
+    fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
+}
+
+pub trait Primary {
+    fn black() -> Self;
+    fn white() -> Self;
+    fn red() -> Self;
+    fn green() -> Self;
+    fn blue() -> Self;
+    fn yellow() -> Self;
+    fn magenta() -> Self;
+    fn cyan() -> Self;
 }
 
 pub trait ToHex {
@@ -64,46 +66,10 @@ pub trait ToHex {
     fn to_hex(&self) -> Result<HexColor, Self::Err>;
 }
 
-impl ToHex for ReducedRGBA {
-    type Err = ColorBoundsError;
-
-    fn to_hex(&self) -> Result<HexColor, Self::Err> {
-        Ok(HexColor {
-            color: format!("#{:02x}{:02x}{:02x}", self.red, self.green, self.blue,),
-            alpha: self.alpha as f32 / 255.0,
-        })
-    }
-}
-
-impl ToHex for RGBA {
-    type Err = ColorBoundsError;
-
-    /// Converts an [RGBA] color (red, green, blue plus alpha) to a struct
-    /// containing a hex color string and an opacity value, suitable for
-    /// embedding into an svg image
-    fn to_hex(&self) -> Result<HexColor, Self::Err> {
-        if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
-            Err(ColorBoundsError::Negative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.green > 1.0 {
-            Err(ColorBoundsError::High)
-        } else {
-            Ok(HexColor {
-                color: format!(
-                    "#{:02x}{:02x}{:02x}",
-                    (self.red * 255.0) as u8,
-                    (self.green * 255.0) as u8,
-                    (self.blue * 255.0) as u8,
-                ),
-                alpha: self.alpha,
-            })
-        }
-    }
-}
-
 impl ToHex for Color {
-    type Err = ColorBoundsError;
+    type Err = ColorError;
 
-    fn to_hex(&self) -> Result<HexColor, ColorBoundsError> {
+    fn to_hex(&self) -> Result<HexColor, ColorError> {
         match self {
             Color::Hex(c) => Ok(HexColor {
                 color: c.color.clone(),
@@ -119,19 +85,9 @@ pub trait ToRGBA {
     fn to_rgba(&self) -> RGBA;
 }
 
-impl ToRGBA for ReducedRGBA {
-    fn to_rgba(&self) -> RGBA {
-        RGBA {
-            red: f32::from(self.red) / 255.0,
-            green: f32::from(self.green) / 255.0,
-            blue: f32::from(self.blue) / 255.0,
-            alpha: f32::from(self.alpha) / 255.0,
-        }
-    }
-}
-
 pub trait ToReducedRGBA {
-    fn to_reduced_rgba(&self);
+    type Err;
+    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err>;
 }
 
 #[cfg(feature = "gtk")]
@@ -139,261 +95,13 @@ pub trait ToGdk {
     fn to_gdk(&self) -> gdk::RGBA;
 }
 
-#[cfg(feature = "gtk")]
-pub trait FromGdk {
-    fn from_gdk(color: &gdk::RGBA) -> Self;
-}
-
-#[cfg(feature = "gtk")]
-impl ToGdk for ReducedRGBA {
-    fn to_gdk(&self) -> gdk::RGBA {
-        gdk::RGBA {
-            red: f32::from(self.red) / 255.0,
-            green: f32::from(self.green) / 255.0,
-            blue: f32::from(self.blue) / 255.0,
-            alpha: f32::from(self.alpha) / 255.0,
-        }
-    }
-}
-
-impl ReducedRGBA {
-    #[cfg(feature = "gtk")]
-    pub fn from_gdk(color: &gdk::RGBA) -> ReducedRGBA {
-        RGBA {
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
-            alpha: color.alpha,
-        }
-        .to_reduced()
-    }
-
-    pub fn black() -> ReducedRGBA {
-        ReducedRGBA {
-            red: 0,
-            green: 0,
-            blue: 0,
-            alpha: 255,
-        }
-    }
-
-    pub fn white() -> ReducedRGBA {
-        ReducedRGBA {
-            red: 255,
-            green: 255,
-            blue: 255,
-            alpha: 255,
-        }
-    }
-
-    pub fn red() -> ReducedRGBA {
-        ReducedRGBA {
-            red: 255,
-            green: 0,
-            blue: 0,
-            alpha: 255,
-        }
-    }
-
-    pub fn green() -> ReducedRGBA {
-        ReducedRGBA {
-            red: 0,
-            green: 255,
-            blue: 0,
-            alpha: 255,
-        }
-    }
-
-    pub fn blue() -> ReducedRGBA {
-        ReducedRGBA {
-            red: 0,
-            green: 0,
-            blue: 255,
-            alpha: 255,
-        }
-    }
-}
-
-impl RGBA {
-    pub fn to_reduced(&self) -> ReducedRGBA {
-        ReducedRGBA {
-            red: (self.red * 255.0) as u8,
-            green: (self.green * 255.0) as u8,
-            blue: (self.blue * 255.0) as u8,
-            alpha: (self.alpha * 255.0) as u8,
-        }
-    }
-
-    #[cfg(feature = "gtk")]
-    pub fn to_gdk(&self) -> gdk::RGBA {
-        gdk::RGBA {
-            red: self.red,
-            green: self.green,
-            blue: self.blue,
-            alpha: self.alpha,
-        }
-    }
-
-    #[cfg(feature = "gtk")]
-    pub fn from_gdk(color: &gdk::RGBA) -> RGBA {
-        RGBA {
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
-            alpha: color.alpha,
-        }
-    }
-
-    /// Returns "black" as an [RGBA] struct
-    pub fn black() -> RGBA {
-        RGBA {
-            red: 0.0,
-            green: 0.0,
-            blue: 0.0,
-            alpha: 1.0,
-        }
-    }
-
-    /// Returns "white" as an [RGBA] struct
-    pub fn white() -> RGBA {
-        RGBA {
-            red: 1.0,
-            green: 1.0,
-            blue: 1.0,
-            alpha: 1.0,
-        }
-    }
-
-    /// Returns "red" as an [RGBA] struct
-    pub fn red() -> RGBA {
-        RGBA {
-            red: 1.0,
-            green: 0.0,
-            blue: 0.0,
-            alpha: 1.0,
-        }
-    }
-
-    /// Returns "green" as an [RGBA] struct
-    pub fn green() -> RGBA {
-        RGBA {
-            red: 0.0,
-            green: 1.0,
-            blue: 0.0,
-            alpha: 1.0,
-        }
-    }
-
-    /// Returns "blue" as an [RGBA] struct
-    pub fn blue() -> RGBA {
-        RGBA {
-            red: 0.0,
-            green: 0.0,
-            blue: 1.0,
-            alpha: 1.0,
-        }
-    }
-
-    /// Returns "yellow" as an [RGBA] struct
-    pub fn yellow() -> RGBA {
-        RGBA {
-            red: 1.0,
-            green: 1.0,
-            blue: 0.0,
-            alpha: 1.0,
-        }
-    }
-
-    /// Returns "cyan" as an [RGBA] struct
-    pub fn cyan() -> RGBA {
-        RGBA {
-            red: 0.0,
-            green: 1.0,
-            blue: 1.0,
-            alpha: 1.0,
-        }
-    }
-
-    /// Returns "magenta" as an [RGBA] struct
-    pub fn magenta() -> RGBA {
-        RGBA {
-            red: 1.0,
-            green: 0.0,
-            blue: 1.0,
-            alpha: 1.0,
-        }
-    }
-}
-
 impl Color {
     #[cfg(feature = "gtk")]
-    pub fn to_gdk(&self) -> Option<gdk::RGBA> {
+    pub fn to_gdk(&self) -> Result<gdk::RGBA, ColorError> {
         match self {
             Color::Hex(c) => c.to_gdk(),
-            Color::Rgba(c) => Some(c.to_gdk()),
-            Color::Reduced(c) => Some(c.to_gdk()),
-        }
-    }
-}
-
-impl HexColor {
-    pub fn to_reduced(&self) -> Option<ReducedRGBA> {
-        if let Ok(buf) = hex::decode(&self.color[1..]) {
-            return Some(ReducedRGBA {
-                red: buf[0],
-                green: buf[1],
-                blue: buf[2],
-                alpha: (self.alpha * 255.0) as u8,
-            });
-        }
-        None
-    }
-
-    pub fn to_rgba(&self) -> Option<RGBA> {
-        self.to_reduced().map(|color| color.to_rgba())
-    }
-
-    #[cfg(feature = "gtk")]
-    pub fn to_gdk(&self) -> Option<gdk::RGBA> {
-        if let Some(color) = self.to_reduced() {
-            Some(color.to_gdk())
-        } else {
-            None
-        }
-    }
-
-    pub fn black() -> HexColor {
-        HexColor {
-            color: String::from("#000000"),
-            alpha: 1.0,
-        }
-    }
-
-    pub fn white() -> HexColor {
-        HexColor {
-            color: String::from("#ffffff"),
-            alpha: 1.0,
-        }
-    }
-
-    pub fn red() -> HexColor {
-        HexColor {
-            color: String::from("#ff0000"),
-            alpha: 1.0,
-        }
-    }
-
-    pub fn green() -> HexColor {
-        HexColor {
-            color: String::from("#00ff00"),
-            alpha: 1.0,
-        }
-    }
-
-    pub fn blue() -> HexColor {
-        HexColor {
-            color: String::from("#0000ff"),
-            alpha: 1.0,
+            Color::Rgba(c) => c.to_gdk(),
+            Color::Reduced(c) => c.to_gdk(),
         }
     }
 }
@@ -438,7 +146,7 @@ mod tests {
             color: String::from("#ff0000"),
             alpha: 1.0,
         };
-        let red = red_hex.to_reduced().unwrap();
+        let red = red_hex.to_reduced_rgba().unwrap();
         assert_eq!(red.red, 255);
         assert_eq!(red.green, 0);
         assert_eq!(red.blue, 0);
@@ -449,7 +157,7 @@ mod tests {
     #[test]
     fn rgba_to_gdk() {
         let red = RGBA::red();
-        let gdk_red = red.to_gdk();
+        let gdk_red = red.to_gdk().unwrap();
         assert_eq!(red.red, gdk_red.red);
         assert_eq!(red.green, gdk_red.green);
         assert_eq!(red.blue, gdk_red.blue);
@@ -465,7 +173,7 @@ mod tests {
             blue: 0.0,
             alpha: 1.0,
         };
-        let red = RGBA::from_gdk(&gdk_red);
+        let red = gdk_red.to_rgba().unwrap();
         assert_eq!(red.red, gdk_red.red);
         assert_eq!(red.green, gdk_red.green);
         assert_eq!(red.blue, gdk_red.blue);
