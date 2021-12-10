@@ -6,6 +6,18 @@
 //! and from `gtk::gdk::RGBA`, making one use case storing colors generated from
 //! a Gtk+ gui in a config file, using one of the many formats with `serde`
 //! support.
+//!
+//! Use this library if your color needs are simple and you don't require
+//! addressing colors in otherr color spaces, such as CMYK or HSL.
+//!
+//! ## Examples
+//! ```Rust
+//! use rgba_simple::{ReducedRGBA, HexColor, Primary, Convert}
+//!
+//! let red = ReducedRGBA::red();
+//! let red_hex = HexColor::red();
+//! assert_eq!(red.to_hex().unwrap(), red_hex);
+//! ```
 #[cfg(feature = "gtk")]
 use gtk::gdk;
 use serde::{Deserialize, Serialize};
@@ -20,6 +32,8 @@ pub use rgba::RGBA;
 #[cfg(feature = "gtk")]
 pub mod gdk_impl;
 
+/// An `enum` which can represent one of the three color storage types provided
+/// by this library. Implements the `Convert` and `Primary` traits.
 #[derive(Clone, Deserialize, Debug, Serialize)]
 #[serde(tag = "ColorType")]
 pub enum Color {
@@ -28,6 +42,7 @@ pub enum Color {
     Rgba(RGBA),
 }
 
+/// Errors which might occur when validating or converting colors
 #[derive(Clone, Debug, PartialEq)]
 pub enum ColorError {
     OutsideBoundsNegative,
@@ -41,6 +56,8 @@ impl fmt::Display for ColorError {
     }
 }
 
+/// Conversions between different color storage types
+/// > Note: some of these operations are lossy
 pub trait Convert {
     type Err;
     /// # Errors
@@ -66,6 +83,7 @@ pub trait Convert {
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
 }
 
+/// Initializes the color storage type with the specified color
 pub trait Primary {
     fn black() -> Self;
     fn white() -> Self;

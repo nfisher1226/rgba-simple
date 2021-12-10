@@ -1,9 +1,11 @@
 use gtk::gdk;
 use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, RGBA};
 
+/// Note: some of these operations are lossy
 impl Convert for gdk::RGBA {
     type Err = ColorError;
 
+    /// > Note: this operation is lossy
     /// # Errors
     ///
     /// Will return `ColorError` if any field is less than 0 or greater
@@ -46,6 +48,7 @@ impl Convert for gdk::RGBA {
         }
     }
 
+    /// > Note: this operation is lossy
     /// # Errors
     ///
     /// Will return `ColorError` if any field is less than 0 or greater

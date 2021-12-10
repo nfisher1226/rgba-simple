@@ -13,6 +13,7 @@ pub struct ReducedRGBA {
     pub alpha: u8,
 }
 
+/// > Note: none of these operations are lossy
 impl Convert for ReducedRGBA {
     type Err = ColorError;
 

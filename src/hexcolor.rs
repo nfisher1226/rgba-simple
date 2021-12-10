@@ -11,6 +11,7 @@ pub struct HexColor {
     pub alpha: f32,
 }
 
+/// > Note: none of these operations are lossy
 impl Convert for HexColor {
     type Err = ColorError;
 

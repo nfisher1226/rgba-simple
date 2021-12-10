@@ -1,9 +1,24 @@
 # Simple RGBA
-Simple RGBA represents colors in RGBA color space, using either u8 or f64 types,
-can convert those color to and from each other and to and from hexadecimal
-strings, and can optionally do conversions to and from `gdk::RGBA` colors.
+<!-- cargo-sync-readme start -->
 
-Use this library if your needs are very simple and you don't require addressing
-color spaces other than RGBA. It is also useful for storing colors which can be
-easily moved to and from `gdk` color representation, as the structs can be
-serialized and deserialized using `serde`
+`Rgba_simple` is a small library for storing colors in RGBA and Hex notation.
+It includes functions to convert to and from Hex and RGBA. All of the internal
+formats can be serialized and deserialized with `serde`. If compiled with the
+`gtk` feature, all of it's internal representations can also be converted to
+and from `gtk::gdk::RGBA`, making one use case storing colors generated from
+a Gtk+ gui in a config file, using one of the many formats with `serde`
+support.
+
+Use this library if your color needs are simple and you don't require
+addressing colors in otherr color spaces, such as CMYK or HSL.
+
+## Examples
+```Rust
+use rgba_simple::{ReducedRGBA, HexColor, Primary, Convert}
+
+let red = ReducedRGBA::red();
+let red_hex = HexColor::red();
+assert_eq!(red.to_hex().unwrap(), red_hex);
+```
+
+<!-- cargo-sync-readme end -->

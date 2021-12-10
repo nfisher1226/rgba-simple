@@ -13,12 +13,14 @@ pub struct RGBA {
     pub alpha: f32,
 }
 
+/// > Note: some of these operations are lossy
 impl Convert for RGBA {
     type Err = ColorError;
 
     /// Converts an [RGBA] color (red, green, blue plus alpha) to a struct
     /// containing a hex color string and an opacity value, suitable for
-    /// embedding into an svg image
+    /// web usage.
+    /// > Note: this operation is lossy
     /// # Errors
     ///
     /// Will return `ColorError` if any field is less than 0 or greater
@@ -56,6 +58,9 @@ impl Convert for RGBA {
         }
     }
 
+    /// Converts an `RGBA` struct into a `ReducedRGBA` struct, using `u8` for
+    /// storage of the color channels rather than f64.
+    /// > Note: this operation is lossy
     /// # Errors
     ///
     /// Will return `ColorError` if any field is less than 0 or greater
