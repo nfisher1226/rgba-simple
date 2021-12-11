@@ -131,3 +131,26 @@ impl Convert for Color {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn to_hex() {
+        let color = Color::Rgba(RGBA::cyan());
+        assert_eq!(color.to_hex(), Ok(HexColor::cyan()));
+    }
+
+    #[test]
+    fn to_rgba() {
+        let color = Color::Reduced(ReducedRGBA::yellow());
+        assert_eq!(color.to_rgba(), Ok(RGBA::yellow()));
+    }
+
+    #[test]
+    fn to_reduced() {
+        let color = Color::Hex(HexColor::magenta());
+        assert_eq!(color.to_reduced_rgba(), Ok(ReducedRGBA::magenta()));
+    }
+}

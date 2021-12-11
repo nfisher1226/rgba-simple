@@ -276,10 +276,8 @@ mod tests {
 
     #[test]
     fn to_hex() {
-        let red = RGBA::red();
-        let red_hex = red.to_hex().unwrap();
-        assert_eq!(red_hex.color, String::from("#ff0000"));
-        assert_eq!(red_hex.alpha, 1.0);
+        let red = RGBA::red().to_hex();
+        assert_eq!(red, Ok(HexColor::red()));
     }
 
     #[test]
@@ -335,11 +333,8 @@ mod tests {
 
     #[test]
     fn to_reduced_rgba() {
-        let red = RGBA::red().to_reduced_rgba().unwrap();
-        assert_eq!(red.red, 255);
-        assert_eq!(red.green, 0);
-        assert_eq!(red.blue, 0);
-        assert_eq!(red.alpha, 255);
+        let red = RGBA::red().to_reduced_rgba();
+        assert_eq!(red, Ok(ReducedRGBA::red()));
     }
 
     #[test]

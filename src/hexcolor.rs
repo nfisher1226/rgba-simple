@@ -208,8 +208,8 @@ mod tests {
     #[test]
     fn to_hex() {
         let foo = HexColor::blue();
-        let bar = foo.to_hex().unwrap();
-        assert_eq!(foo, bar);
+        let bar = foo.to_hex();
+        assert_eq!(bar, Ok(HexColor::blue()));
     }
 
     #[test]

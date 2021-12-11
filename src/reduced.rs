@@ -122,3 +122,126 @@ impl Primary for ReducedRGBA {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn black() {
+        let k = ReducedRGBA::black();
+        assert_eq!(k, ReducedRGBA {
+            red: 0,
+            green: 0,
+            blue: 0,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn white() {
+        let w = ReducedRGBA::white();
+        assert_eq!(w, ReducedRGBA {
+            red: 255,
+            green: 255,
+            blue: 255,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn red() {
+        let red = ReducedRGBA::red();
+        assert_eq!(red, ReducedRGBA {
+            red: 255,
+            green: 0,
+            blue: 0,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn green() {
+        let grn = ReducedRGBA::green();
+            assert_eq!(grn, ReducedRGBA {
+            red: 0,
+            green: 255,
+            blue: 0,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn blue() {
+        let blue = ReducedRGBA::blue();
+            assert_eq!(blue, ReducedRGBA {
+            red: 0,
+            green: 0,
+            blue: 255,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn yellow() {
+        let yel = ReducedRGBA::yellow();
+            assert_eq!(yel, ReducedRGBA {
+            red: 255,
+            green: 255,
+            blue: 0,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn magenta() {
+        let mag = ReducedRGBA::magenta();
+            assert_eq!(mag, ReducedRGBA {
+            red: 255,
+            green: 0,
+            blue: 255,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn cyan() {
+        let c = ReducedRGBA::cyan();
+            assert_eq!(c, ReducedRGBA {
+            red: 0,
+            green: 255,
+            blue: 255,
+            alpha: 255,
+        });
+    }
+
+    #[test]
+    fn to_hex() {
+        let red = ReducedRGBA::red();
+        let red_hex = red.to_hex().unwrap();
+        assert_eq!(red_hex.color, String::from("#ff0000"));
+        assert_eq!(red_hex.alpha, 1.0);
+    }
+
+    #[test]
+    fn to_rgba() {
+        let red = ReducedRGBA::red().to_rgba();
+        assert_eq!(red, Ok(RGBA::red()));
+    }
+
+    #[test]
+    fn to_reduced_rgba() {
+        let red = ReducedRGBA::red();
+        assert_eq!(red, red.to_reduced_rgba().unwrap());
+    }
+
+    #[cfg(feature = "gtk")]
+    #[test]
+    fn rgba_to_gdk() {
+        let red = ReducedRGBA::red().to_gdk().unwrap();
+        assert_eq!(red.red, 1.0);
+        assert_eq!(red.green, 0.0);
+        assert_eq!(red.blue, 0.0);
+        assert_eq!(red.alpha, 1.0);
+    }
+}
