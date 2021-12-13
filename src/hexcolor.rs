@@ -1,7 +1,7 @@
 #[cfg(feature = "gtk")]
 use gtk::gdk;
 use serde::{Deserialize, Serialize};
-use crate::{ColorError, Convert, Primary, ReducedRGBA, RGBA};
+use crate::{ColorError, Convert, Primary, ReducedRGBA, RGBA, Validate};
 
 /// This struct contains a color represented in hex notation plus an opacity
 /// value. This is necessary to represent colors in an SVG image
@@ -11,28 +11,38 @@ pub struct HexColor {
     pub alpha: f32,
 }
 
+impl Validate for HexColor {
+    type Err = ColorError;
+
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
+    fn validate(&self) -> Result<(), ColorError> {
+        if self.alpha < 0.0 {
+            Err(ColorError::OutsideBoundsNegative)
+        } else if self.alpha > 1.0 {
+            Err(ColorError::OutsideBoundsHigh)
+        } else if hex::decode(&self.color[1..]).is_err() {
+            Err(ColorError::InvalidHex)
+        } else {
+            Ok(())
+        }
+    }
+}
+
 /// > Note: none of these operations are lossy
 impl Convert for HexColor {
     type Err = ColorError;
 
     fn to_hex(&self) -> Result<Self, Self::Err> {
-        if self.alpha < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.alpha > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else if self.to_reduced_rgba().is_err() {
-            Err(ColorError::InvalidHex)
-        } else {
-            Ok(self.clone())
-        }
+        self.validate()?;
+        Ok(self.clone())
     }
 
     fn to_rgba(&self) -> Result<RGBA, Self::Err> {
-        if self.alpha < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.alpha > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else if let Ok(color) = self.to_reduced_rgba() {
+        self.validate()?;
+        if let Ok(color) = self.to_reduced_rgba() {
             color.to_rgba()
         } else {
             Err(ColorError::InvalidHex)
@@ -41,11 +51,8 @@ impl Convert for HexColor {
 
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
-        if self.alpha < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.alpha > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else if let Ok(buf) = hex::decode(&self.color[1..]) {
+        self.validate()?;
+        if let Ok(buf) = hex::decode(&self.color[1..]) {
             Ok(ReducedRGBA {
                 red: buf[0],
                 green: buf[1],
@@ -59,11 +66,8 @@ impl Convert for HexColor {
 
     #[cfg(feature = "gtk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
-        if self.alpha < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.alpha > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else if let Ok(color) = self.to_reduced_rgba() {
+        self.validate()?;
+        if let Ok(color) = self.to_reduced_rgba() {
             color.to_gdk()
         } else {
             Err(ColorError::InvalidHex)

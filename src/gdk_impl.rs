@@ -1,5 +1,23 @@
 use gtk::gdk;
-use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, RGBA};
+use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, RGBA, Validate};
+
+impl Validate for gdk::RGBA {
+    type Err = ColorError;
+
+    /// # Errors
+    ///
+    /// Will return `ColorError` if any field is less than 0 or greater
+    /// than 1.0
+    fn validate(&self) -> Result<(), ColorError> {
+        if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
+            Err(ColorError::OutsideBoundsNegative)
+        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
+            Err(ColorError::OutsideBoundsHigh)
+        } else {
+            Ok(())
+        }
+    }
+}
 
 /// Note: some of these operations are lossy
 impl Convert for gdk::RGBA {
@@ -12,21 +30,16 @@ impl Convert for gdk::RGBA {
     /// than 1.0
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_hex(&self) -> Result<HexColor, Self::Err> {
-        if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else {
-            Ok(HexColor {
-                color: format!(
-                    "#{:02x}{:02x}{:02x}",
-                    (self.red * 255.0) as u8,
-                    (self.green * 255.0) as u8,
-                    (self.blue * 255.0) as u8,
-                ),
-                alpha: self.alpha,
-            })
-        }
+        self.validate()?;
+        Ok(HexColor {
+            color: format!(
+                "#{:02x}{:02x}{:02x}",
+                (self.red * 255.0) as u8,
+                (self.green * 255.0) as u8,
+                (self.blue * 255.0) as u8,
+            ),
+            alpha: self.alpha,
+        })
     }
 
     /// # Errors
@@ -34,18 +47,13 @@ impl Convert for gdk::RGBA {
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
     fn to_rgba(&self) -> Result<RGBA, Self::Err> {
-        if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else {
-            Ok(RGBA {
-                red: self.red,
-                green: self.green,
-                blue: self.blue,
-                alpha: self.alpha,
-            })
-        }
+        self.validate()?;
+        Ok(RGBA {
+            red: self.red,
+            green: self.green,
+            blue: self.blue,
+            alpha: self.alpha,
+        })
     }
 
     /// > Note: this operation is lossy
@@ -55,18 +63,13 @@ impl Convert for gdk::RGBA {
     /// than 1.0
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
-        if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else {
-            Ok(ReducedRGBA {
-                red: (self.red * 255.0) as u8,
-                green: (self.green * 255.0) as u8,
-                blue: (self.blue * 255.0) as u8,
-                alpha: (self.alpha * 255.0) as u8,
-            })
-        }
+        self.validate()?;
+        Ok(ReducedRGBA {
+            red: (self.red * 255.0) as u8,
+            green: (self.green * 255.0) as u8,
+            blue: (self.blue * 255.0) as u8,
+            alpha: (self.alpha * 255.0) as u8,
+        })
     }
 
     /// # Errors
@@ -74,13 +77,8 @@ impl Convert for gdk::RGBA {
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
     fn to_gdk(&self) -> Result<Self, Self::Err> {
-        if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
-            Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
-            Err(ColorError::OutsideBoundsHigh)
-        } else {
-            Ok(*self)
-        }
+        self.validate()?;
+        Ok(*self)
     }
 }
 

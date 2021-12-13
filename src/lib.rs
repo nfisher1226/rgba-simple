@@ -56,10 +56,17 @@ impl fmt::Display for ColorError {
     }
 }
 
+pub trait Validate {
+    type Err;
+
+    fn validate(&self) -> Result<(), Self::Err>;
+}
+
 /// Conversions between different color storage types
 /// > Note: some of these operations are lossy
 pub trait Convert {
     type Err;
+
     /// # Errors
     ///
     /// Will return `ColorError` if any field is less than 0 or greater

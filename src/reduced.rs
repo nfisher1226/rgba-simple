@@ -5,7 +5,7 @@ use crate::{ColorError, Convert, HexColor, Primary, RGBA};
 
 /// This struct represents colors in 8-bit precision as separate
 /// Red, Green, and Blue channels
-#[derive(Clone, Deserialize, Debug, PartialEq, Serialize)]
+#[derive(Clone, Copy, Deserialize, Debug, PartialEq, Serialize)]
 pub struct ReducedRGBA {
     pub red: u8,
     pub green: u8,
@@ -35,7 +35,7 @@ impl Convert for ReducedRGBA {
 
     #[allow(clippy::cast_sign_loss)]
     fn to_reduced_rgba(&self) -> Result<Self, Self::Err> {
-        Ok(self.clone())
+        Ok(*self)
     }
 
     #[cfg(feature = "gtk")]
