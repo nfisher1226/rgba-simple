@@ -2,8 +2,8 @@
 //! `Rgba_simple` is a small library for storing colors in RGBA and Hex notation.
 //! It includes functions to convert to and from Hex and RGBA. All of the internal
 //! formats can be serialized and deserialized with `serde`. If compiled with the
-//! `gtk` feature, all of it's internal representations can also be converted to
-//! and from `gtk::gdk::RGBA`, making one use case storing colors generated from
+//! `gdk` feature, all of it's internal representations can also be converted to
+//! and from `gdk::RGBA`, making one use case storing colors generated from
 //! a Gtk+ gui in a config file, using one of the many formats with `serde`
 //! support.
 //!
@@ -18,8 +18,8 @@
 //! let red_hex = HexColor::red();
 //! assert_eq!(red.to_hex().unwrap(), red_hex);
 //! ```
-#[cfg(feature = "gtk")]
-use gtk::gdk;
+#[cfg(feature = "gdk")]
+use gdk;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -29,7 +29,7 @@ pub mod reduced;
 pub use reduced::ReducedRGBA;
 pub mod rgba;
 pub use rgba::RGBA;
-#[cfg(feature = "gtk")]
+#[cfg(feature = "gdk")]
 pub mod gdk_impl;
 
 /// An `enum` which can represent one of the three color storage types provided
@@ -47,7 +47,9 @@ pub enum Color {
 pub enum ColorError {
     OutsideBoundsNegative,
     OutsideBoundsHigh,
-    InvalidHex,
+    TruncatedHexString,
+    HexStringOverflow,
+    InvalidHexCharacter,
 }
 
 impl fmt::Display for ColorError {
@@ -86,7 +88,7 @@ pub trait Convert {
     ///
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
 }
 
@@ -129,7 +131,7 @@ impl Convert for Color {
         }
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
         match self {
             Color::Hex(c) => c.to_gdk(),

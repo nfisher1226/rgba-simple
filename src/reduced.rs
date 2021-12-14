@@ -1,5 +1,5 @@
-#[cfg(feature = "gtk")]
-use gtk::gdk;
+#[cfg(feature = "gdk")]
+use gdk;
 use serde::{Deserialize, Serialize};
 use crate::{ColorError, Convert, HexColor, Primary, RGBA};
 
@@ -38,7 +38,7 @@ impl Convert for ReducedRGBA {
         Ok(*self)
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
         Ok(gdk::RGBA {
             red: f32::from(self.red) / 255.0,
@@ -235,7 +235,7 @@ mod tests {
         assert_eq!(red, red.to_reduced_rgba().unwrap());
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn rgba_to_gdk() {
         let red = ReducedRGBA::red().to_gdk().unwrap();

@@ -1,7 +1,8 @@
-#[cfg(feature = "gtk")]
-use gtk::gdk;
+#[cfg(feature = "gdk")]
+use gdk;
 use serde::{Deserialize, Serialize};
 use crate::{ColorError, Convert, Primary, ReducedRGBA, RGBA, Validate};
+use std::u8;
 
 /// This struct contains a color represented in hex notation plus an opacity
 /// value. This is necessary to represent colors in an SVG image
@@ -9,6 +10,35 @@ use crate::{ColorError, Convert, Primary, ReducedRGBA, RGBA, Validate};
 pub struct HexColor {
     pub color: String,
     pub alpha: f32,
+}
+
+fn parse_hex(hex: &str) -> Result<(u8, u8, u8), ColorError> {
+    validate_hex_string(hex)?;
+    Ok((match u8::from_str_radix(&hex[1..3], 16) {
+            Ok(c) => c,
+            Err(_) => return Err(ColorError::InvalidHexCharacter),
+        },
+        match u8::from_str_radix(&hex[3..5], 16) {
+            Ok(c) => c,
+            Err(_) => return Err(ColorError::InvalidHexCharacter),
+        },
+        match u8::from_str_radix(&hex[5..7], 16) {
+            Ok(c) => c,
+            Err(_) => return Err(ColorError::InvalidHexCharacter),
+        },
+    ))
+}
+
+fn validate_hex_string(hex: &str) -> Result<(), ColorError> {
+    match &hex.len() {
+        x if *x < 7 => return Err(ColorError::TruncatedHexString),
+        x if *x > 7 => return Err(ColorError::HexStringOverflow),
+        _ => {},
+    };
+    if &hex[0..1] != "#" {
+        return Err(ColorError::InvalidHexCharacter);
+    }
+    Ok(())
 }
 
 impl Validate for HexColor {
@@ -23,10 +53,11 @@ impl Validate for HexColor {
             Err(ColorError::OutsideBoundsNegative)
         } else if self.alpha > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
-        } else if hex::decode(&self.color[1..]).is_err() {
-            Err(ColorError::InvalidHex)
         } else {
-            Ok(())
+             match parse_hex(&self.color) {
+                Err(e) => Err(e),
+                Ok(_) => Ok(()),
+            }
         }
     }
 }
@@ -42,35 +73,32 @@ impl Convert for HexColor {
 
     fn to_rgba(&self) -> Result<RGBA, Self::Err> {
         self.validate()?;
-        if let Ok(color) = self.to_reduced_rgba() {
-            color.to_rgba()
-        } else {
-            Err(ColorError::InvalidHex)
+        match self.to_reduced_rgba() {
+            Ok(color) => color.to_rgba(),
+            Err(e) => Err(e),
         }
     }
 
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
         self.validate()?;
-        if let Ok(buf) = hex::decode(&self.color[1..]) {
-            Ok(ReducedRGBA {
-                red: buf[0],
-                green: buf[1],
-                blue: buf[2],
+        match parse_hex(&self.color) {
+            Ok(color) => Ok(ReducedRGBA {
+                red: color.0,
+                green: color.1,
+                blue: color.2,
                 alpha: (self.alpha * 255.0) as u8,
-            })
-        } else {
-            Err(ColorError::InvalidHex)
+            }),
+            Err(e) => Err(e),
         }
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
         self.validate()?;
-        if let Ok(color) = self.to_reduced_rgba() {
-            color.to_gdk()
-        } else {
-            Err(ColorError::InvalidHex)
+        match self.to_reduced_rgba() {
+            Ok(color) => color.to_gdk(),
+            Err(e) => Err(e),
         }
     }
 }
@@ -223,7 +251,7 @@ mod tests {
             alpha: 1.0,
         };
         let bar = foo.to_hex();
-        assert_eq!(bar, Err(ColorError::InvalidHex));
+        assert_eq!(bar, Err(ColorError::InvalidHexCharacter));
     }
 
     #[test]
@@ -260,7 +288,7 @@ mod tests {
             alpha: 1.0,
         };
         let bar = foo.to_rgba();
-        assert_eq!(bar, Err(ColorError::InvalidHex));
+        assert_eq!(bar, Err(ColorError::InvalidHexCharacter));
     }
 
     #[test]
@@ -297,7 +325,7 @@ mod tests {
             alpha: 1.0,
         };
         let bar = foo.to_reduced_rgba();
-        assert_eq!(bar, Err(ColorError::InvalidHex));
+        assert_eq!(bar, Err(ColorError::InvalidHexCharacter));
     }
 
     #[test]
@@ -320,7 +348,7 @@ mod tests {
         assert_eq!(bar, Err(ColorError::OutsideBoundsHigh));
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn to_gdk() {
         let red = HexColor::red().to_gdk();
@@ -332,7 +360,7 @@ mod tests {
         }));
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn to_gdk_invalid() {
         let foo = HexColor {
@@ -340,10 +368,10 @@ mod tests {
             alpha: 1.0,
         };
         let bar = foo.to_gdk();
-        assert_eq!(bar, Err(ColorError::InvalidHex));
+        assert_eq!(bar, Err(ColorError::InvalidHexCharacter));
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn to_gdk_negative() {
         let foo = HexColor {
@@ -354,7 +382,7 @@ mod tests {
         assert_eq!(bar, Err(ColorError::OutsideBoundsNegative));
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn to_gdk_high() {
         let foo = HexColor {

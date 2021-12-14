@@ -1,4 +1,4 @@
-use gtk::gdk;
+use gdk;
 use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, RGBA, Validate};
 
 impl Validate for gdk::RGBA {

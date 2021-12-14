@@ -1,5 +1,5 @@
-#[cfg(feature = "gtk")]
-use gtk::gdk;
+#[cfg(feature = "gdk")]
+use gdk;
 use serde::{Deserialize, Serialize};
 use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, Validate};
 
@@ -88,7 +88,7 @@ impl Convert for RGBA {
     ///
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
         self.validate()?;
         Ok(gdk::RGBA {
@@ -357,7 +357,7 @@ mod tests {
         assert_eq!(invalid.to_reduced_rgba(), Err(ColorError::OutsideBoundsHigh));
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn rgba_to_gdk() {
         let red = RGBA::red();
@@ -368,7 +368,7 @@ mod tests {
         assert_eq!(red.alpha, gdk_red.alpha);
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn to_gdk_negative() {
         let invalid = RGBA {
@@ -380,7 +380,7 @@ mod tests {
         assert_eq!(invalid.to_gdk(), Err(ColorError::OutsideBoundsNegative));
     }
 
-    #[cfg(feature = "gtk")]
+    #[cfg(feature = "gdk")]
     #[test]
     fn to_gdk_high() {
         let invalid = RGBA {
