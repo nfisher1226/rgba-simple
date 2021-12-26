@@ -1,5 +1,5 @@
+use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, Validate, RGBA};
 use gdk;
-use crate::{ColorError, Convert, HexColor, Primary, ReducedRGBA, RGBA, Validate};
 
 impl Validate for gdk::RGBA {
     type Err = ColorError;
@@ -163,89 +163,113 @@ mod tests {
     #[test]
     fn black() {
         let k = gdk::RGBA::black();
-        assert_eq!(k, gdk::RGBA {
-            red: 0.0,
-            green: 0.0,
-            blue: 0.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            k,
+            gdk::RGBA {
+                red: 0.0,
+                green: 0.0,
+                blue: 0.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn white() {
         let w = gdk::RGBA::white();
-        assert_eq!(w, gdk::RGBA {
-            red: 1.0,
-            green: 1.0,
-            blue: 1.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            w,
+            gdk::RGBA {
+                red: 1.0,
+                green: 1.0,
+                blue: 1.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn red() {
         let red = gdk::RGBA::red();
-        assert_eq!(red, gdk::RGBA {
-            red: 1.0,
-            green: 0.0,
-            blue: 0.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            red,
+            gdk::RGBA {
+                red: 1.0,
+                green: 0.0,
+                blue: 0.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn green() {
         let grn = gdk::RGBA::green();
-            assert_eq!(grn, gdk::RGBA {
-            red: 0.0,
-            green: 1.0,
-            blue: 0.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            grn,
+            gdk::RGBA {
+                red: 0.0,
+                green: 1.0,
+                blue: 0.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn blue() {
         let blue = gdk::RGBA::blue();
-            assert_eq!(blue, gdk::RGBA {
-            red: 0.0,
-            green: 0.0,
-            blue: 1.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            blue,
+            gdk::RGBA {
+                red: 0.0,
+                green: 0.0,
+                blue: 1.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn yellow() {
         let yel = gdk::RGBA::yellow();
-            assert_eq!(yel, gdk::RGBA {
-            red: 1.0,
-            green: 1.0,
-            blue: 0.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            yel,
+            gdk::RGBA {
+                red: 1.0,
+                green: 1.0,
+                blue: 0.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn magenta() {
         let mag = gdk::RGBA::magenta();
-            assert_eq!(mag, gdk::RGBA {
-            red: 1.0,
-            green: 0.0,
-            blue: 1.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            mag,
+            gdk::RGBA {
+                red: 1.0,
+                green: 0.0,
+                blue: 1.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn cyan() {
         let c = gdk::RGBA::cyan();
-            assert_eq!(c, gdk::RGBA {
-            red: 0.0,
-            green: 1.0,
-            blue: 1.0,
-            alpha: 1.0,
-        });
+        assert_eq!(
+            c,
+            gdk::RGBA {
+                red: 0.0,
+                green: 1.0,
+                blue: 1.0,
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
@@ -321,7 +345,10 @@ mod tests {
             blue: -1.0,
             alpha: 1.0,
         };
-        assert_eq!(invalid.to_reduced_rgba(), Err(ColorError::OutsideBoundsNegative));
+        assert_eq!(
+            invalid.to_reduced_rgba(),
+            Err(ColorError::OutsideBoundsNegative)
+        );
     }
 
     #[test]
@@ -332,7 +359,10 @@ mod tests {
             blue: 1.0,
             alpha: 1.0,
         };
-        assert_eq!(invalid.to_reduced_rgba(), Err(ColorError::OutsideBoundsHigh));
+        assert_eq!(
+            invalid.to_reduced_rgba(),
+            Err(ColorError::OutsideBoundsHigh)
+        );
     }
 
     #[test]
