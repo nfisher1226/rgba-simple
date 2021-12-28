@@ -13,6 +13,12 @@ pub struct RGBA {
     pub alpha: f32,
 }
 
+impl RGBA {
+    fn to_string(&self) -> String {
+        format!("RGBA({}, {}, {}, {})", self.red, self.green, self.blue, self.alpha)
+    }
+}
+
 impl Validate for RGBA {
     type Err = ColorError;
 

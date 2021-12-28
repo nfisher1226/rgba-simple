@@ -13,6 +13,12 @@ pub struct ReducedRGBA {
     pub alpha: u8,
 }
 
+impl ReducedRGBA {
+    fn to_string(&self) -> String {
+        format!("ReducedRGBA({}, {}, {}, {})", self.red, self.green, self.blue, self.alpha)
+    }
+}
+
 /// > Note: none of these operations are lossy
 impl Convert for ReducedRGBA {
     type Err = ColorError;
