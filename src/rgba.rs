@@ -13,9 +13,9 @@ pub struct RGBA {
     pub alpha: f32,
 }
 
-impl RGBA {
+impl ToString for RGBA {
     fn to_string(&self) -> String {
-        format!("RGBA({}, {}, {}, {})", self.red, self.green, self.blue, self.alpha)
+        format!("RGBA({:.3}, {:.3}, {:.3}, {:.3})", self.red, self.green, self.blue, self.alpha)
     }
 }
 
@@ -300,6 +300,12 @@ mod tests {
                 alpha: 1.0,
             }
         );
+    }
+
+    #[test]
+    fn to_string() {
+        let blk = RGBA::black().to_string();
+        assert_eq!(blk, "RGBA(0.000, 0.000, 0.000, 1.000)");
     }
 
     #[test]

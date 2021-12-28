@@ -12,6 +12,12 @@ pub struct HexColor {
     pub alpha: f32,
 }
 
+impl ToString for HexColor {
+    fn to_string(&self) -> String {
+        format!("color: {}, alpha: {:.3}", self.color, self.alpha)
+    }
+}
+
 fn parse_hex(hex: &str) -> Result<(u8, u8, u8), ColorError> {
     validate_hex_string(hex)?;
     Ok((
@@ -260,6 +266,12 @@ mod tests {
                 alpha: 1.0,
             }
         );
+    }
+
+    #[test]
+    fn to_string() {
+        let red = HexColor::red().to_string();
+        assert_eq!(red, "color: #ff0000, alpha: 1.000");
     }
 
     #[test]

@@ -13,7 +13,7 @@ pub struct ReducedRGBA {
     pub alpha: u8,
 }
 
-impl ReducedRGBA {
+impl ToString for ReducedRGBA {
     fn to_string(&self) -> String {
         format!("ReducedRGBA({}, {}, {}, {})", self.red, self.green, self.blue, self.alpha)
     }
@@ -243,6 +243,12 @@ mod tests {
                 alpha: 255,
             }
         );
+    }
+
+    #[test]
+    fn to_string() {
+        let blk = ReducedRGBA::black().to_string();
+        assert_eq!(blk, "ReducedRGBA(0, 0, 0, 255)");
     }
 
     #[test]
