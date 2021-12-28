@@ -18,8 +18,6 @@
 //! let red_hex = HexColor::red();
 //! assert_eq!(red.to_hex().unwrap(), red_hex);
 //! ```
-#[cfg(feature = "gdk")]
-use gdk;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -61,6 +59,10 @@ impl fmt::Display for ColorError {
 pub trait Validate {
     type Err;
 
+    /// # Errors
+    ///
+    /// Will return `ColorError` if the color fails
+    /// to validate
     fn validate(&self) -> Result<(), Self::Err>;
 }
 

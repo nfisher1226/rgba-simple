@@ -1,7 +1,7 @@
+use crate::{ColorError, Convert, HexColor, Primary, RGBA};
 #[cfg(feature = "gdk")]
 use gdk;
 use serde::{Deserialize, Serialize};
-use crate::{ColorError, Convert, HexColor, Primary, RGBA};
 
 /// This struct represents colors in 8-bit precision as separate
 /// Red, Green, and Blue channels
@@ -136,89 +136,113 @@ mod tests {
     #[test]
     fn black() {
         let k = ReducedRGBA::black();
-        assert_eq!(k, ReducedRGBA {
-            red: 0,
-            green: 0,
-            blue: 0,
-            alpha: 255,
-        });
+        assert_eq!(
+            k,
+            ReducedRGBA {
+                red: 0,
+                green: 0,
+                blue: 0,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]
     fn white() {
         let w = ReducedRGBA::white();
-        assert_eq!(w, ReducedRGBA {
-            red: 255,
-            green: 255,
-            blue: 255,
-            alpha: 255,
-        });
+        assert_eq!(
+            w,
+            ReducedRGBA {
+                red: 255,
+                green: 255,
+                blue: 255,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]
     fn red() {
         let red = ReducedRGBA::red();
-        assert_eq!(red, ReducedRGBA {
-            red: 255,
-            green: 0,
-            blue: 0,
-            alpha: 255,
-        });
+        assert_eq!(
+            red,
+            ReducedRGBA {
+                red: 255,
+                green: 0,
+                blue: 0,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]
     fn green() {
         let grn = ReducedRGBA::green();
-            assert_eq!(grn, ReducedRGBA {
-            red: 0,
-            green: 255,
-            blue: 0,
-            alpha: 255,
-        });
+        assert_eq!(
+            grn,
+            ReducedRGBA {
+                red: 0,
+                green: 255,
+                blue: 0,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]
     fn blue() {
         let blue = ReducedRGBA::blue();
-            assert_eq!(blue, ReducedRGBA {
-            red: 0,
-            green: 0,
-            blue: 255,
-            alpha: 255,
-        });
+        assert_eq!(
+            blue,
+            ReducedRGBA {
+                red: 0,
+                green: 0,
+                blue: 255,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]
     fn yellow() {
         let yel = ReducedRGBA::yellow();
-            assert_eq!(yel, ReducedRGBA {
-            red: 255,
-            green: 255,
-            blue: 0,
-            alpha: 255,
-        });
+        assert_eq!(
+            yel,
+            ReducedRGBA {
+                red: 255,
+                green: 255,
+                blue: 0,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]
     fn magenta() {
         let mag = ReducedRGBA::magenta();
-            assert_eq!(mag, ReducedRGBA {
-            red: 255,
-            green: 0,
-            blue: 255,
-            alpha: 255,
-        });
+        assert_eq!(
+            mag,
+            ReducedRGBA {
+                red: 255,
+                green: 0,
+                blue: 255,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]
     fn cyan() {
         let c = ReducedRGBA::cyan();
-            assert_eq!(c, ReducedRGBA {
-            red: 0,
-            green: 255,
-            blue: 255,
-            alpha: 255,
-        });
+        assert_eq!(
+            c,
+            ReducedRGBA {
+                red: 0,
+                green: 255,
+                blue: 255,
+                alpha: 255,
+            }
+        );
     }
 
     #[test]

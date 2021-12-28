@@ -1,7 +1,7 @@
+use crate::{ColorError, Convert, Primary, ReducedRGBA, Validate, RGBA};
 #[cfg(feature = "gdk")]
 use gdk;
 use serde::{Deserialize, Serialize};
-use crate::{ColorError, Convert, Primary, ReducedRGBA, RGBA, Validate};
 use std::u8;
 
 /// This struct contains a color represented in hex notation plus an opacity
@@ -14,7 +14,8 @@ pub struct HexColor {
 
 fn parse_hex(hex: &str) -> Result<(u8, u8, u8), ColorError> {
     validate_hex_string(hex)?;
-    Ok((match u8::from_str_radix(&hex[1..3], 16) {
+    Ok((
+        match u8::from_str_radix(&hex[1..3], 16) {
             Ok(c) => c,
             Err(_) => return Err(ColorError::InvalidHexCharacter),
         },
@@ -33,7 +34,7 @@ fn validate_hex_string(hex: &str) -> Result<(), ColorError> {
     match &hex.len() {
         x if *x < 7 => return Err(ColorError::TruncatedHexString),
         x if *x > 7 => return Err(ColorError::HexStringOverflow),
-        _ => {},
+        _ => {}
     };
     if &hex[0..1] != "#" {
         return Err(ColorError::InvalidHexCharacter);
@@ -54,7 +55,7 @@ impl Validate for HexColor {
         } else if self.alpha > 1.0 {
             Err(ColorError::OutsideBoundsHigh)
         } else {
-             match parse_hex(&self.color) {
+            match parse_hex(&self.color) {
                 Err(e) => Err(e),
                 Ok(_) => Ok(()),
             }
@@ -168,73 +169,97 @@ mod tests {
     #[test]
     fn black() {
         let k = HexColor::black();
-        assert_eq!(k, HexColor {
-            color: String::from("#000000"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            k,
+            HexColor {
+                color: String::from("#000000"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn white() {
         let w = HexColor::white();
-        assert_eq!(w, HexColor {
-            color: String::from("#ffffff"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            w,
+            HexColor {
+                color: String::from("#ffffff"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn red() {
         let red = HexColor::red();
-        assert_eq!(red, HexColor {
-            color: String::from("#ff0000"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            red,
+            HexColor {
+                color: String::from("#ff0000"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn green() {
         let grn = HexColor::green();
-            assert_eq!(grn, HexColor {
-            color: String::from("#00ff00"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            grn,
+            HexColor {
+                color: String::from("#00ff00"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn blue() {
         let blue = HexColor::blue();
-            assert_eq!(blue, HexColor {
-            color: String::from("#0000ff"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            blue,
+            HexColor {
+                color: String::from("#0000ff"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn yellow() {
         let yel = HexColor::yellow();
-            assert_eq!(yel, HexColor {
-            color: String::from("#ffff00"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            yel,
+            HexColor {
+                color: String::from("#ffff00"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn magenta() {
         let mag = HexColor::magenta();
-            assert_eq!(mag, HexColor {
-            color: String::from("#ff00ff"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            mag,
+            HexColor {
+                color: String::from("#ff00ff"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
     fn cyan() {
         let c = HexColor::cyan();
-            assert_eq!(c, HexColor {
-            color: String::from("#00ffff"),
-            alpha: 1.0,
-        });
+        assert_eq!(
+            c,
+            HexColor {
+                color: String::from("#00ffff"),
+                alpha: 1.0,
+            }
+        );
     }
 
     #[test]
@@ -352,12 +377,15 @@ mod tests {
     #[test]
     fn to_gdk() {
         let red = HexColor::red().to_gdk();
-        assert_eq!(red, Ok(gdk::RGBA {
-            red: 1.0,
-            green: 0.0,
-            blue: 0.0,
-            alpha: 1.0,
-        }));
+        assert_eq!(
+            red,
+            Ok(gdk::RGBA {
+                red: 1.0,
+                green: 0.0,
+                blue: 0.0,
+                alpha: 1.0,
+            })
+        );
     }
 
     #[cfg(feature = "gdk")]
