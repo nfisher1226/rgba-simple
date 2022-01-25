@@ -1,4 +1,4 @@
-use crate::{ColorError, Convert, Primary, ReducedRGBA, Validate, RGBA};
+use crate::{ColorError, Convert, Primary, PrimaryColor, ReducedRGBA, Validate, RGBA};
 #[cfg(feature = "gdk")]
 use gdk;
 use serde::{Deserialize, Serialize};
@@ -8,7 +8,10 @@ use std::u8;
 /// value. This is necessary to represent colors in an SVG image
 #[derive(Clone, Deserialize, Debug, PartialEq, Serialize)]
 pub struct HexColor {
+    /// A seven character string beginning with '#' representing the three
+    /// colors red, green and blue in hexadecimal
     pub color: String,
+    /// The opacity of the color
     pub alpha: f32,
 }
 
@@ -105,58 +108,18 @@ impl Convert for HexColor {
 }
 
 impl Primary for HexColor {
-    fn black() -> Self {
+    fn primary(color: PrimaryColor) -> Self {
         Self {
-            color: String::from("#000000"),
-            alpha: 1.0,
-        }
-    }
-
-    fn white() -> Self {
-        Self {
-            color: String::from("#ffffff"),
-            alpha: 1.0,
-        }
-    }
-
-    fn red() -> Self {
-        Self {
-            color: String::from("#ff0000"),
-            alpha: 1.0,
-        }
-    }
-
-    fn green() -> Self {
-        Self {
-            color: String::from("#00ff00"),
-            alpha: 1.0,
-        }
-    }
-
-    fn blue() -> Self {
-        Self {
-            color: String::from("#0000ff"),
-            alpha: 1.0,
-        }
-    }
-
-    fn yellow() -> Self {
-        Self {
-            color: String::from("#ffff00"),
-            alpha: 1.0,
-        }
-    }
-
-    fn magenta() -> Self {
-        Self {
-            color: String::from("#ff00ff"),
-            alpha: 1.0,
-        }
-    }
-
-    fn cyan() -> Self {
-        Self {
-            color: String::from("#00ffff"),
+            color: String::from(match color {
+                PrimaryColor::Black => "#000000",
+                PrimaryColor::White => "#ffffff",
+                PrimaryColor::Red => "#ff0000",
+                PrimaryColor::Green => "#00ff00",
+                PrimaryColor::Blue => "#0000ff",
+                PrimaryColor::Yellow => "#ffff00",
+                PrimaryColor::Magenta => "#ff00ff",
+                PrimaryColor::Cyan => "#00ffff",
+            }),
             alpha: 1.0,
         }
     }
@@ -168,7 +131,7 @@ mod tests {
 
     #[test]
     fn black() {
-        let k = HexColor::black();
+        let k = HexColor::primary(PrimaryColor::Black);
         assert_eq!(
             k,
             HexColor {
@@ -180,7 +143,7 @@ mod tests {
 
     #[test]
     fn white() {
-        let w = HexColor::white();
+        let w = HexColor::primary(PrimaryColor::White);
         assert_eq!(
             w,
             HexColor {
@@ -192,7 +155,7 @@ mod tests {
 
     #[test]
     fn red() {
-        let red = HexColor::red();
+        let red = HexColor::primary(PrimaryColor::Red);
         assert_eq!(
             red,
             HexColor {
@@ -204,7 +167,7 @@ mod tests {
 
     #[test]
     fn green() {
-        let grn = HexColor::green();
+        let grn = HexColor::primary(PrimaryColor::Green);
         assert_eq!(
             grn,
             HexColor {
@@ -216,7 +179,7 @@ mod tests {
 
     #[test]
     fn blue() {
-        let blue = HexColor::blue();
+        let blue = HexColor::primary(PrimaryColor::Blue);
         assert_eq!(
             blue,
             HexColor {
@@ -228,7 +191,7 @@ mod tests {
 
     #[test]
     fn yellow() {
-        let yel = HexColor::yellow();
+        let yel = HexColor::primary(PrimaryColor::Yellow);
         assert_eq!(
             yel,
             HexColor {
@@ -240,7 +203,7 @@ mod tests {
 
     #[test]
     fn magenta() {
-        let mag = HexColor::magenta();
+        let mag = HexColor::primary(PrimaryColor::Magenta);
         assert_eq!(
             mag,
             HexColor {
@@ -252,7 +215,7 @@ mod tests {
 
     #[test]
     fn cyan() {
-        let c = HexColor::cyan();
+        let c = HexColor::primary(PrimaryColor::Cyan);
         assert_eq!(
             c,
             HexColor {
@@ -264,9 +227,9 @@ mod tests {
 
     #[test]
     fn to_hex() {
-        let foo = HexColor::blue();
+        let foo = HexColor::primary(PrimaryColor::Blue);
         let bar = foo.to_hex();
-        assert_eq!(bar, Ok(HexColor::blue()));
+        assert_eq!(bar, Ok(HexColor::primary(PrimaryColor::Blue)));
     }
 
     #[test]
@@ -301,9 +264,9 @@ mod tests {
 
     #[test]
     fn to_rgba() {
-        let foo = HexColor::green();
+        let foo = HexColor::primary(PrimaryColor::Green);
         let bar = foo.to_rgba();
-        assert_eq!(bar, Ok(RGBA::green()));
+        assert_eq!(bar, Ok(RGBA::primary(PrimaryColor::Green)));
     }
 
     #[test]
@@ -338,9 +301,9 @@ mod tests {
 
     #[test]
     fn to_reduced() {
-        let red_hex = HexColor::red();
+        let red_hex = HexColor::primary(PrimaryColor::Red);
         let red = red_hex.to_reduced_rgba();
-        assert_eq!(red, Ok(ReducedRGBA::red()));
+        assert_eq!(red, Ok(ReducedRGBA::primary(PrimaryColor::Red)));
     }
 
     #[test]
@@ -376,16 +339,11 @@ mod tests {
     #[cfg(feature = "gdk")]
     #[test]
     fn to_gdk() {
-        let red = HexColor::red().to_gdk();
-        assert_eq!(
-            red,
-            Ok(gdk::RGBA {
-                red: 1.0,
-                green: 0.0,
-                blue: 0.0,
-                alpha: 1.0,
-            })
-        );
+        let red = HexColor::primary(PrimaryColor::Red).to_gdk().unwrap();
+        assert_eq!(red.red(), 1.0);
+        assert_eq!(red.green(), 0.0);
+        assert_eq!(red.blue(), 0.0);
+        assert_eq!(red.alpha(), 1.0);
     }
 
     #[cfg(feature = "gdk")]

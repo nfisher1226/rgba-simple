@@ -21,14 +21,14 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-pub mod hexcolor;
+mod hexcolor;
 pub use hexcolor::HexColor;
-pub mod reduced;
+mod reduced;
 pub use reduced::ReducedRGBA;
-pub mod rgba;
+mod rgba;
 pub use rgba::RGBA;
 #[cfg(feature = "gdk")]
-pub mod gdk_impl;
+mod gdk_impl;
 
 /// An `enum` which can represent one of the three color storage types provided
 /// by this library. Implements the `Convert` and `Primary` traits.
@@ -56,6 +56,7 @@ impl fmt::Display for ColorError {
     }
 }
 
+/// Checks that the stored values represent a valid color
 pub trait Validate {
     type Err;
 
@@ -94,16 +95,21 @@ pub trait Convert {
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
 }
 
+/// An enumeration of primary and secondary colors
+pub enum PrimaryColor {
+    Black,
+    White,
+    Red,
+    Green,
+    Blue,
+    Yellow,
+    Magenta,
+    Cyan,
+}
+
 /// Initializes the color storage type with the specified color
 pub trait Primary {
-    fn black() -> Self;
-    fn white() -> Self;
-    fn red() -> Self;
-    fn green() -> Self;
-    fn blue() -> Self;
-    fn yellow() -> Self;
-    fn magenta() -> Self;
-    fn cyan() -> Self;
+    fn primary(color: PrimaryColor) -> Self;
 }
 
 impl Convert for Color {
@@ -149,19 +155,22 @@ mod tests {
 
     #[test]
     fn to_hex() {
-        let color = Color::Rgba(RGBA::cyan());
-        assert_eq!(color.to_hex(), Ok(HexColor::cyan()));
+        let color = Color::Rgba(RGBA::primary(PrimaryColor::Cyan));
+        assert_eq!(color.to_hex(), Ok(HexColor::primary(PrimaryColor::Cyan)));
     }
 
     #[test]
     fn to_rgba() {
-        let color = Color::Reduced(ReducedRGBA::yellow());
-        assert_eq!(color.to_rgba(), Ok(RGBA::yellow()));
+        let color = Color::Reduced(ReducedRGBA::primary(PrimaryColor::Yellow));
+        assert_eq!(color.to_rgba(), Ok(RGBA::primary(PrimaryColor::Yellow)));
     }
 
     #[test]
     fn to_reduced() {
-        let color = Color::Hex(HexColor::magenta());
-        assert_eq!(color.to_reduced_rgba(), Ok(ReducedRGBA::magenta()));
+        let color = Color::Hex(HexColor::primary(PrimaryColor::Magenta));
+        assert_eq!(
+            color.to_reduced_rgba(),
+            Ok(ReducedRGBA::primary(PrimaryColor::Magenta))
+        );
     }
 }

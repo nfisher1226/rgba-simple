@@ -1,4 +1,4 @@
-use crate::{ColorError, Convert, HexColor, Primary, RGBA};
+use crate::{ColorError, Convert, HexColor, Primary, PrimaryColor, RGBA};
 #[cfg(feature = "gdk")]
 use gdk;
 use serde::{Deserialize, Serialize};
@@ -40,84 +40,39 @@ impl Convert for ReducedRGBA {
 
     #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
-        Ok(gdk::RGBA {
-            red: f32::from(self.red) / 255.0,
-            green: f32::from(self.green) / 255.0,
-            blue: f32::from(self.blue) / 255.0,
-            alpha: f32::from(self.alpha) / 255.0,
-        })
+        Ok(gdk::builders::RGBABuilder::new()
+            .red(f32::from(self.red) / 255.0)
+            .green(f32::from(self.green) / 255.0)
+            .blue(f32::from(self.blue) / 255.0)
+            .alpha(f32::from(self.alpha) / 255.0)
+            .build())
     }
 }
 
 impl Primary for ReducedRGBA {
-    fn black() -> Self {
+    fn primary(color: PrimaryColor) -> Self {
         Self {
-            red: 0,
-            green: 0,
-            blue: 0,
-            alpha: 255,
-        }
-    }
-
-    fn white() -> Self {
-        Self {
-            red: 255,
-            green: 255,
-            blue: 255,
-            alpha: 255,
-        }
-    }
-
-    fn red() -> Self {
-        Self {
-            red: 255,
-            green: 0,
-            blue: 0,
-            alpha: 255,
-        }
-    }
-
-    fn green() -> Self {
-        Self {
-            red: 0,
-            green: 255,
-            blue: 0,
-            alpha: 255,
-        }
-    }
-
-    fn blue() -> Self {
-        Self {
-            red: 0,
-            green: 0,
-            blue: 255,
-            alpha: 255,
-        }
-    }
-
-    fn yellow() -> Self {
-        Self {
-            red: 255,
-            green: 255,
-            blue: 0,
-            alpha: 255,
-        }
-    }
-
-    fn magenta() -> Self {
-        Self {
-            red: 255,
-            green: 0,
-            blue: 255,
-            alpha: 255,
-        }
-    }
-
-    fn cyan() -> Self {
-        Self {
-            red: 0,
-            green: 255,
-            blue: 255,
+            red: match color {
+                PrimaryColor::Black
+                | PrimaryColor::Green
+                | PrimaryColor::Blue
+                | PrimaryColor::Cyan => 0,
+                _ => 255,
+            },
+            green: match color {
+                PrimaryColor::Black
+                | PrimaryColor::Red
+                | PrimaryColor::Blue
+                | PrimaryColor::Magenta => 0,
+                _ => 255,
+            },
+            blue: match color {
+                PrimaryColor::Black
+                | PrimaryColor::Red
+                | PrimaryColor::Green
+                | PrimaryColor::Yellow => 0,
+                _ => 255,
+            },
             alpha: 255,
         }
     }
@@ -129,7 +84,7 @@ mod tests {
 
     #[test]
     fn black() {
-        let k = ReducedRGBA::black();
+        let k = ReducedRGBA::primary(PrimaryColor::Black);
         assert_eq!(
             k,
             ReducedRGBA {
@@ -143,7 +98,7 @@ mod tests {
 
     #[test]
     fn white() {
-        let w = ReducedRGBA::white();
+        let w = ReducedRGBA::primary(PrimaryColor::White);
         assert_eq!(
             w,
             ReducedRGBA {
@@ -157,7 +112,7 @@ mod tests {
 
     #[test]
     fn red() {
-        let red = ReducedRGBA::red();
+        let red = ReducedRGBA::primary(PrimaryColor::Red);
         assert_eq!(
             red,
             ReducedRGBA {
@@ -171,7 +126,7 @@ mod tests {
 
     #[test]
     fn green() {
-        let grn = ReducedRGBA::green();
+        let grn = ReducedRGBA::primary(PrimaryColor::Green);
         assert_eq!(
             grn,
             ReducedRGBA {
@@ -185,7 +140,7 @@ mod tests {
 
     #[test]
     fn blue() {
-        let blue = ReducedRGBA::blue();
+        let blue = ReducedRGBA::primary(PrimaryColor::Blue);
         assert_eq!(
             blue,
             ReducedRGBA {
@@ -199,7 +154,7 @@ mod tests {
 
     #[test]
     fn yellow() {
-        let yel = ReducedRGBA::yellow();
+        let yel = ReducedRGBA::primary(PrimaryColor::Yellow);
         assert_eq!(
             yel,
             ReducedRGBA {
@@ -213,7 +168,7 @@ mod tests {
 
     #[test]
     fn magenta() {
-        let mag = ReducedRGBA::magenta();
+        let mag = ReducedRGBA::primary(PrimaryColor::Magenta);
         assert_eq!(
             mag,
             ReducedRGBA {
@@ -227,7 +182,7 @@ mod tests {
 
     #[test]
     fn cyan() {
-        let c = ReducedRGBA::cyan();
+        let c = ReducedRGBA::primary(PrimaryColor::Cyan);
         assert_eq!(
             c,
             ReducedRGBA {
@@ -241,7 +196,7 @@ mod tests {
 
     #[test]
     fn to_hex() {
-        let red = ReducedRGBA::red();
+        let red = ReducedRGBA::primary(PrimaryColor::Red);
         let red_hex = red.to_hex().unwrap();
         assert_eq!(red_hex.color, String::from("#ff0000"));
         assert_eq!(red_hex.alpha, 1.0);
@@ -249,23 +204,23 @@ mod tests {
 
     #[test]
     fn to_rgba() {
-        let red = ReducedRGBA::red().to_rgba();
-        assert_eq!(red, Ok(RGBA::red()));
+        let red = ReducedRGBA::primary(PrimaryColor::Red).to_rgba();
+        assert_eq!(red, Ok(RGBA::primary(PrimaryColor::Red)));
     }
 
     #[test]
     fn to_reduced_rgba() {
-        let red = ReducedRGBA::red();
+        let red = ReducedRGBA::primary(PrimaryColor::Red);
         assert_eq!(red, red.to_reduced_rgba().unwrap());
     }
 
     #[cfg(feature = "gdk")]
     #[test]
     fn rgba_to_gdk() {
-        let red = ReducedRGBA::red().to_gdk().unwrap();
-        assert_eq!(red.red, 1.0);
-        assert_eq!(red.green, 0.0);
-        assert_eq!(red.blue, 0.0);
-        assert_eq!(red.alpha, 1.0);
+        let red = ReducedRGBA::primary(PrimaryColor::Red).to_gdk().unwrap();
+        assert_eq!(red.red(), 1.0);
+        assert_eq!(red.green(), 0.0);
+        assert_eq!(red.blue(), 0.0);
+        assert_eq!(red.alpha(), 1.0);
     }
 }
