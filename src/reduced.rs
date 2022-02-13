@@ -202,7 +202,7 @@ mod tests {
 
     #[test]
     fn to_string() {
-        let blk = ReducedRGBA::black().to_string();
+        let blk = ReducedRGBA::primary(PrimaryColor::Black).to_string();
         assert_eq!(blk, "ReducedRGBA(0, 0, 0, 255)");
     }
 

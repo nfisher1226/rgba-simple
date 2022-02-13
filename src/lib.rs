@@ -56,6 +56,16 @@ impl fmt::Display for ColorError {
     }
 }
 
+impl ToString for Color {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Hex(c) => c.to_string(),
+            Self::Reduced(c) => c.to_string(),
+            Self::Rgba(c) => c.to_string(),
+        }
+    }
+}
+
 /// Checks that the stored values represent a valid color
 pub trait Validate {
     type Err;

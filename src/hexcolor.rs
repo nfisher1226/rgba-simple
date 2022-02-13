@@ -233,7 +233,7 @@ mod tests {
 
     #[test]
     fn to_string() {
-        let red = HexColor::red().to_string();
+        let red = HexColor::primary(PrimaryColor::Red).to_string();
         assert_eq!(red, "color: #ff0000, alpha: 1.000");
     }
 

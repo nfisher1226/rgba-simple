@@ -253,7 +253,7 @@ mod tests {
 
     #[test]
     fn to_string() {
-        let blk = RGBA::black().to_string();
+        let blk = RGBA::primary(PrimaryColor::Black).to_string();
         assert_eq!(blk, "RGBA(0.000, 0.000, 0.000, 1.000)");
     }
 
