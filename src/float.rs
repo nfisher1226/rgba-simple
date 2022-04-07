@@ -1,25 +1,29 @@
-use crate::{ColorError, Convert, HexColor, Primary, PrimaryColor, ReducedRGBA, Validate};
+use crate::{ColorError, Float, HexColor, NumType, Primary, PrimaryColor::*, Validate, ToHex};
 #[cfg(feature = "gdk")]
-use gdk;
+use {crate::ToGdk, gdk};
+use num::{Num, FromPrimitive, ToPrimitive};
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// This struct represents colors in floating point precision as separate
 /// Red, Green, and Blue channels plus a separate Alpha (Opacity) channel
 #[derive(Clone, Copy, Deserialize, Debug, PartialEq, Serialize)]
-pub struct RGBA {
-    pub red: f32,
-    pub green: f32,
-    pub blue: f32,
-    pub alpha: f32,
+pub struct RGBA<T: NumType> {
+    pub red: T,
+    pub green: T,
+    pub blue: T,
+    pub alpha: T,
 }
 
-impl ToString for RGBA {
-    fn to_string(&self) -> String {
-        format!("RGBA({:.3}, {:.3}, {:.3}, {:.3})", self.red, self.green, self.blue, self.alpha)
+impl<T> fmt::Display for RGBA<T>
+where T: fmt::Display + Num + NumType<Num = Float> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "RGBA({:.3}, {:.3}, {:.3}, {:.3})", self.red, self.green, self.blue, self.alpha)
     }
 }
 
-impl Validate for RGBA {
+impl<T> Validate for RGBA<T>
+where T: num::Float + FromPrimitive + NumType {
     type Err = ColorError;
 
     /// # Errors
@@ -27,9 +31,13 @@ impl Validate for RGBA {
     /// Will return `ColorError` if any field is less than 0 or greater
     /// than 1.0
     fn validate(&self) -> Result<(), ColorError> {
-        if self.red < 0.0 || self.green < 0.0 || self.blue < 0.0 {
+        if self.red < FromPrimitive::from_f64(0.0).unwrap()
+            || self.green < FromPrimitive::from_f64(0.0).unwrap()
+            || self.blue < FromPrimitive::from_f64(0.0).unwrap() {
             Err(ColorError::OutsideBoundsNegative)
-        } else if self.red > 1.0 || self.green > 1.0 || self.blue > 1.0 {
+        } else if self.red > FromPrimitive::from_f64(1.0).unwrap()
+            || self.green > FromPrimitive::from_f64(1.0).unwrap()
+            || self.blue > FromPrimitive::from_f64(1.0).unwrap() {
             Err(ColorError::OutsideBoundsHigh)
         } else {
             Ok(())
@@ -37,100 +45,55 @@ impl Validate for RGBA {
     }
 }
 
-/// > Note: some of these operations are lossy
-impl Convert for RGBA {
+impl<T> ToHex for RGBA<T>
+where T: num::Num + ToPrimitive + NumType<Num = Float> {
     type Err = ColorError;
 
-    /// Converts an [RGBA] color (red, green, blue plus alpha) to a struct
-    /// containing a hex color string and an opacity value, suitable for
-    /// web usage.
-    /// > Note: this operation is lossy
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     fn to_hex(&self) -> Result<HexColor, Self::Err> {
-        self.validate()?;
         Ok(HexColor {
             color: format!(
                 "#{:02x}{:02x}{:02x}",
-                (self.red * 255.0) as u8,
-                (self.green * 255.0) as u8,
-                (self.blue * 255.0) as u8,
+                (self.red.to_f32().unwrap() * 255.0).round() as u8,
+                (self.green.to_f32().unwrap() * 255.0).round() as u8,
+                (self.blue.to_f32().unwrap() * 255.0).round() as u8,
             ),
-            alpha: self.alpha,
+            alpha: self.alpha.to_f32().unwrap()
         })
     }
+}
 
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0
-    fn to_rgba(&self) -> Result<Self, Self::Err> {
-        self.validate()?;
-        Ok(*self)
-    }
+#[cfg(feature = "gdk")]
+impl<T> ToGdk for RGBA<T>
+where T: num::Num + ToPrimitive + NumType<Num = Float> {
+    type Err = ColorError;
 
-    /// Converts an `RGBA` struct into a `ReducedRGBA` struct, using `u8` for
-    /// storage of the color channels rather than f64.
-    /// > Note: this operation is lossy
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
-    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
-        self.validate()?;
-        Ok(ReducedRGBA {
-            red: (self.red * 255.0) as u8,
-            green: (self.green * 255.0) as u8,
-            blue: (self.blue * 255.0) as u8,
-            alpha: (self.alpha * 255.0) as u8,
-        })
-    }
-
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0
-    #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
-        self.validate()?;
         Ok(gdk::builders::RGBABuilder::new()
-            .red(self.red)
-            .green(self.green)
-            .blue(self.blue)
-            .alpha(self.alpha)
+            .red(self.red.to_f32().unwrap())
+            .green(self.green.to_f32().unwrap())
+            .blue(self.blue.to_f32().unwrap())
+            .alpha(self.alpha.to_f32().unwrap())
             .build())
     }
 }
 
-impl Primary for RGBA {
-    fn primary(color: PrimaryColor) -> Self {
+impl<T> Primary for RGBA<T>
+where T: num::Float + FromPrimitive +NumType {
+    fn primary(color: crate::PrimaryColor) -> Self {
         Self {
             red: match color {
-                PrimaryColor::Black
-                | PrimaryColor::Green
-                | PrimaryColor::Blue
-                | PrimaryColor::Cyan => 0.0,
-                _ => 1.0,
+                Black | Green | Blue | Cyan => FromPrimitive::from_f64(0.0).unwrap(),
+                _ => FromPrimitive::from_f64(1.0).unwrap(),
             },
             green: match color {
-                PrimaryColor::Black
-                | PrimaryColor::Red
-                | PrimaryColor::Blue
-                | PrimaryColor::Magenta => 0.0,
-                _ => 1.0,
+                Black | Red | Blue | Magenta => FromPrimitive::from_f64(0.0).unwrap(),
+                _ => FromPrimitive::from_f64(1.0).unwrap(),
             },
             blue: match color {
-                PrimaryColor::Black
-                | PrimaryColor::Red
-                | PrimaryColor::Green
-                | PrimaryColor::Yellow => 0.0,
-                _ => 1.0,
+                Black | Red | Green | Yellow => FromPrimitive::from_f64(0.0).unwrap(),
+                _ => FromPrimitive::from_f64(1.0).unwrap(),
             },
-            alpha: 1.0,
+            alpha: FromPrimitive::from_f64(1.0).unwrap(),
         }
     }
 }

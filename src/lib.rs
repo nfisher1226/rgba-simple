@@ -18,26 +18,86 @@
 //! let red_hex = HexColor::red();
 //! assert_eq!(red.to_hex().unwrap(), red_hex);
 //! ```
+use num::Num;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
 mod hexcolor;
 pub use hexcolor::HexColor;
-mod reduced;
-pub use reduced::ReducedRGBA;
-mod rgba;
-pub use rgba::RGBA;
+//mod reduced;
+//pub use reduced::ReducedRGBA;
+pub mod float;
+pub mod int;
 #[cfg(feature = "gdk")]
 mod gdk_impl;
+
+pub struct Int;
+pub struct Float;
+
+pub trait NumType {
+    type Num;
+}
+
+impl NumType for f64 {
+    type Num = Float;
+}
+
+impl NumType for f32 {
+    type Num = Float;
+}
+
+impl NumType for u8 {
+    type Num = Int;
+}
+
+impl NumType for u16 {
+    type Num = Int;
+}
+
+impl NumType for u32 {
+    type Num = Int;
+}
+
+impl NumType for u64 {
+    type Num = Int;
+}
+
+pub trait ToHex {
+    type Err;
+
+    fn to_hex(&self) -> Result<HexColor, Self::Err>;
+}
+
+pub trait ToIntRGBA<T>
+where T: Num + NumType {
+    type Err;
+
+    fn to_int_rgba(&self) -> Result<int::RGBA<T>, Self::Err>;
+}
+
+pub trait ToFloatRGBA<T>
+where T: Num + NumType {
+    type Err;
+
+    fn to_float_rgba(&self) -> Result<int::RGBA<T>, Self::Err>;
+}
+
+
+#[cfg(feature = "gdk")]
+pub trait ToGdk {
+    type Err;
+
+    fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
+}
 
 /// An `enum` which can represent one of the three color storage types provided
 /// by this library. Implements the `Convert` and `Primary` traits.
 #[derive(Clone, Deserialize, Debug, Serialize)]
 #[serde(tag = "ColorType")]
-pub enum Color {
+pub enum Color<T: Num + NumType> {
     Hex(HexColor),
-    Reduced(ReducedRGBA),
-    Rgba(RGBA),
+    Reduced(int::RGBA<T>),
+    Rgba(float::RGBA<T>),
 }
 
 /// Errors which might occur when validating or converting colors
@@ -56,13 +116,10 @@ impl fmt::Display for ColorError {
     }
 }
 
-impl ToString for Color {
-    fn to_string(&self) -> String {
-        match self {
-            Self::Hex(c) => c.to_string(),
-            Self::Reduced(c) => c.to_string(),
-            Self::Rgba(c) => c.to_string(),
-        }
+impl<T> fmt::Display for Color<T>
+where T: fmt::Display + Num + NumType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Color({})", self)
     }
 }
 
@@ -75,34 +132,6 @@ pub trait Validate {
     /// Will return `ColorError` if the color fails
     /// to validate
     fn validate(&self) -> Result<(), Self::Err>;
-}
-
-/// Conversions between different color storage types
-/// > Note: some of these operations are lossy
-pub trait Convert {
-    type Err;
-
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0 or if hex conversion fails
-    fn to_hex(&self) -> Result<HexColor, Self::Err>;
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0
-    fn to_rgba(&self) -> Result<RGBA, Self::Err>;
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0
-    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err>;
-    /// # Errors
-    ///
-    /// Will return `ColorError` if any field is less than 0 or greater
-    /// than 1.0
-    #[cfg(feature = "gdk")]
-    fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err>;
 }
 
 /// An enumeration of primary and secondary colors
@@ -120,43 +149,6 @@ pub enum PrimaryColor {
 /// Initializes the color storage type with the specified color
 pub trait Primary {
     fn primary(color: PrimaryColor) -> Self;
-}
-
-impl Convert for Color {
-    type Err = ColorError;
-
-    fn to_hex(&self) -> Result<HexColor, Self::Err> {
-        match self {
-            Color::Hex(c) => c.to_hex(),
-            Color::Rgba(c) => c.to_hex(),
-            Color::Reduced(c) => c.to_hex(),
-        }
-    }
-
-    fn to_rgba(&self) -> Result<RGBA, Self::Err> {
-        match self {
-            Color::Hex(c) => c.to_rgba(),
-            Color::Rgba(c) => c.to_rgba(),
-            Color::Reduced(c) => c.to_rgba(),
-        }
-    }
-
-    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
-        match self {
-            Color::Hex(c) => c.to_reduced_rgba(),
-            Color::Rgba(c) => c.to_reduced_rgba(),
-            Color::Reduced(c) => c.to_reduced_rgba(),
-        }
-    }
-
-    #[cfg(feature = "gdk")]
-    fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
-        match self {
-            Color::Hex(c) => c.to_gdk(),
-            Color::Rgba(c) => c.to_gdk(),
-            Color::Reduced(c) => c.to_gdk(),
-        }
-    }
 }
 
 #[cfg(test)]

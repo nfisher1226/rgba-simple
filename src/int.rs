@@ -1,24 +1,60 @@
-use crate::{ColorError, Convert, HexColor, Primary, PrimaryColor, RGBA};
+use crate::{ColorError, Int, HexColor, NumType, Primary, PrimaryColor::*, ToHex};
 #[cfg(feature = "gdk")]
-use gdk;
+use {gdk, crate::ToGdk};
+use num::ToPrimitive;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 /// This struct represents colors in 8-bit precision as separate
 /// Red, Green, and Blue channels
 #[derive(Clone, Copy, Deserialize, Debug, PartialEq, Serialize)]
-pub struct ReducedRGBA {
-    pub red: u8,
-    pub green: u8,
-    pub blue: u8,
-    pub alpha: u8,
+pub struct RGBA<T: num::Num + NumType> {
+    pub red: T,
+    pub green: T,
+    pub blue: T,
+    pub alpha: T,
 }
 
-impl ToString for ReducedRGBA {
-    fn to_string(&self) -> String {
-        format!("ReducedRGBA({}, {}, {}, {})", self.red, self.green, self.blue, self.alpha)
+impl<T> fmt::Display for RGBA<T>
+where T: fmt::Display + num::Num + NumType<Num = Int> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "RGBA({}, {}, {}, {})", self.red, self.green, self.blue, self.alpha)
     }
 }
 
+impl<T> ToHex for RGBA<T>
+where T: num::Num + ToPrimitive + NumType<Num = Int> {
+    type Err = ColorError;
+
+    fn to_hex(&self) -> Result<HexColor, Self::Err> {
+        Ok(HexColor {
+            color: format!(
+                "#{:02x}{:02x}{:02x}",
+                self.red.to_u8().unwrap(),
+                self.green.to_u8().unwrap(),
+                self.blue.to_u8().unwrap()
+            ),
+            alpha: self.alpha.to_f32().unwrap() / 255.0,
+        })
+    }
+}
+
+#[cfg(feature = "gdk")]
+impl<T> ToGdk for RGBA<T>
+where T: num::Num + ToPrimitive + NumType<Num = Int> {
+    type Err = ColorError;
+
+    fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
+        Ok(gdk::builders::RGBABuilder::new()
+            .red(self.red.to_f32().unwrap() / 255.0)
+            .green(self.green.to_f32().unwrap() / 255.0)
+            .blue(self.blue.to_f32().unwrap() / 255.0)
+            .alpha(self.alpha.to_f32().unwrap() / 255.0)
+            .build())
+    }
+}
+
+/*
 /// > Note: none of these operations are lossy
 impl Convert for ReducedRGBA {
     type Err = ColorError;
@@ -54,32 +90,25 @@ impl Convert for ReducedRGBA {
             .build())
     }
 }
+*/
 
-impl Primary for ReducedRGBA {
-    fn primary(color: PrimaryColor) -> Self {
+impl<T> Primary for RGBA<T>
+where T: num::Integer + num::FromPrimitive +NumType {
+    fn primary(color: crate::PrimaryColor) -> Self {
         Self {
             red: match color {
-                PrimaryColor::Black
-                | PrimaryColor::Green
-                | PrimaryColor::Blue
-                | PrimaryColor::Cyan => 0,
-                _ => 255,
+                Black | Green | Blue | Cyan => num::FromPrimitive::from_u8(0).unwrap(),
+                _ => num::FromPrimitive::from_u8(255).unwrap(),
             },
             green: match color {
-                PrimaryColor::Black
-                | PrimaryColor::Red
-                | PrimaryColor::Blue
-                | PrimaryColor::Magenta => 0,
-                _ => 255,
+                Black | Red | Blue | Magenta => num::FromPrimitive::from_u8(0).unwrap(),
+                _ => num::FromPrimitive::from_u8(255).unwrap(),
             },
             blue: match color {
-                PrimaryColor::Black
-                | PrimaryColor::Red
-                | PrimaryColor::Green
-                | PrimaryColor::Yellow => 0,
-                _ => 255,
+                Black | Red | Green | Yellow => num::FromPrimitive::from_u8(0).unwrap(),
+                _ => num::FromPrimitive::from_u8(255).unwrap(),
             },
-            alpha: 255,
+            alpha: num::FromPrimitive::from_u8(255).unwrap(),
         }
     }
 }

@@ -1,8 +1,12 @@
-use crate::{ColorError, Convert, Primary, PrimaryColor, ReducedRGBA, Validate, RGBA};
+use crate::{ColorError, Primary, PrimaryColor, Validate};
 #[cfg(feature = "gdk")]
-use gdk;
+use {
+    crate::ToGdk,
+    gdk,
+};
 use serde::{Deserialize, Serialize};
 use std::u8;
+use std::fmt;
 
 /// This struct contains a color represented in hex notation plus an opacity
 /// value. This is necessary to represent colors in an SVG image
@@ -15,9 +19,9 @@ pub struct HexColor {
     pub alpha: f32,
 }
 
-impl ToString for HexColor {
-    fn to_string(&self) -> String {
-        format!("color: {}, alpha: {:.3}", self.color, self.alpha)
+impl fmt::Display for HexColor {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "color: {}, alpha: {:.3}", self.color, self.alpha)
     }
 }
 
@@ -72,44 +76,20 @@ impl Validate for HexColor {
     }
 }
 
-/// > Note: none of these operations are lossy
-impl Convert for HexColor {
+#[cfg(feature = "gdk")]
+impl ToGdk for HexColor {
     type Err = ColorError;
 
-    fn to_hex(&self) -> Result<Self, Self::Err> {
-        self.validate()?;
-        Ok(self.clone())
-    }
-
-    fn to_rgba(&self) -> Result<RGBA, Self::Err> {
-        self.validate()?;
-        match self.to_reduced_rgba() {
-            Ok(color) => color.to_rgba(),
-            Err(e) => Err(e),
-        }
-    }
-
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
-    fn to_reduced_rgba(&self) -> Result<ReducedRGBA, Self::Err> {
-        self.validate()?;
-        match parse_hex(&self.color) {
-            Ok(color) => Ok(ReducedRGBA {
-                red: color.0,
-                green: color.1,
-                blue: color.2,
-                alpha: (self.alpha * 255.0) as u8,
-            }),
-            Err(e) => Err(e),
-        }
-    }
-
-    #[cfg(feature = "gdk")]
     fn to_gdk(&self) -> Result<gdk::RGBA, Self::Err> {
         self.validate()?;
-        match self.to_reduced_rgba() {
-            Ok(color) => color.to_gdk(),
-            Err(e) => Err(e),
-        }
+        let color = parse_hex(&self.color)?;
+        Ok(gdk::builders::RGBABuilder::new()
+            .red(color.0 as f32 / 255.0)
+            .green(color.1 as f32 / 255.0)
+            .blue(color.2 as f32 / 255.0)
+            .alpha(255.0)
+            .build()
+        )
     }
 }
 
