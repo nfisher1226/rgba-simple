@@ -357,8 +357,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "rgb-simple-next"
-version = "0.1.0"
+name = "rgba_simple"
+version = "0.6.0"
 dependencies = [
  "gdk4",
  "serde",

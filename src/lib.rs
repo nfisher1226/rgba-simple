@@ -1,10 +1,12 @@
-pub mod channel;
-pub use channel::ColorChannel;
+pub(crate) mod channel;
+pub(crate) use channel::ColorChannel;
 pub mod colorerror;
 pub use colorerror::ColorError;
 pub mod hex;
-pub use hex::ToHex;
+pub use hex::Hex;
 pub mod primary;
 pub use primary::{Primary, PrimaryColor};
+pub mod rgb;
+pub use rgb::RGB;
 pub mod rgba;
 pub use rgba::RGBA;
