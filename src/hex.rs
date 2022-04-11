@@ -23,6 +23,7 @@ pub trait Hex {
         Self: Sized;
 }
 
+#[doc(hidden)]
 impl Hex for u8 {
     type Err = ColorError;
 
@@ -38,6 +39,7 @@ impl Hex for u8 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for u16 {
     type Err = ColorError;
 
@@ -53,6 +55,7 @@ impl Hex for u16 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for u32 {
     type Err = ColorError;
 
@@ -68,6 +71,7 @@ impl Hex for u32 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for u64 {
     type Err = ColorError;
 
@@ -83,6 +87,7 @@ impl Hex for u64 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for i16 {
     type Err = ColorError;
 
@@ -98,6 +103,7 @@ impl Hex for i16 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for i32 {
     type Err = ColorError;
 
@@ -113,6 +119,7 @@ impl Hex for i32 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for i64 {
     type Err = ColorError;
 
@@ -128,6 +135,7 @@ impl Hex for i64 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for f32 {
     type Err = ColorError;
 
@@ -143,6 +151,7 @@ impl Hex for f32 {
     }
 }
 
+#[doc(hidden)]
 impl Hex for f64 {
     type Err = ColorError;
 
