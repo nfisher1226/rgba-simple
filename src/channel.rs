@@ -1,8 +1,12 @@
-pub trait ColorChannel {
+/// Required trait for a type to be able to represent a color channel
+pub trait ColorChannel: Copy + PartialOrd {
     const MAX: Self;
     const MIN: Self;
 
     fn channel_display(&self) -> String;
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32;
 }
 
 impl ColorChannel for u8 {
@@ -11,6 +15,11 @@ impl ColorChannel for u8 {
 
     fn channel_display(&self) -> String {
         format!("{}", self)
+    }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32 / 255.0
     }
 }
 
@@ -21,6 +30,11 @@ impl ColorChannel for u16 {
     fn channel_display(&self) -> String {
         format!("{}", self)
     }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32 / 255.0
+    }
 }
 
 impl ColorChannel for u32 {
@@ -29,6 +43,11 @@ impl ColorChannel for u32 {
 
     fn channel_display(&self) -> String {
         format!("{}", self)
+    }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32 / 255.0
     }
 }
 
@@ -39,6 +58,11 @@ impl ColorChannel for u64 {
     fn channel_display(&self) -> String {
         format!("{}", self)
     }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32 / 255.0
+    }
 }
 
 impl ColorChannel for i16 {
@@ -47,6 +71,11 @@ impl ColorChannel for i16 {
 
     fn channel_display(&self) -> String {
         format!("{}", self)
+    }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32 / 255.0
     }
 }
 
@@ -57,6 +86,11 @@ impl ColorChannel for i32 {
     fn channel_display(&self) -> String {
         format!("{}", self)
     }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32 / 255.0
+    }
 }
 
 impl ColorChannel for i64 {
@@ -65,6 +99,11 @@ impl ColorChannel for i64 {
 
     fn channel_display(&self) -> String {
         format!("{}", self)
+    }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32 / 255.0
     }
 }
 
@@ -75,6 +114,11 @@ impl ColorChannel for f32 {
     fn channel_display(&self) -> String {
         format!("{:.3}", self)
     }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self
+    }
 }
 
 impl ColorChannel for f64 {
@@ -83,5 +127,10 @@ impl ColorChannel for f64 {
 
     fn channel_display(&self) -> String {
         format!("{:.3}", self)
+    }
+
+    #[cfg(feature = "gdk")]
+    fn to_gdk(&self) -> f32 {
+        *self as f32
     }
 }

@@ -12,10 +12,15 @@ pub(crate) fn validate_hex_string(hex: &str) -> Result<(), ColorError> {
     Ok(())
 }
 
+/// Transformations to and from hexadecimal notation (base 16)
 pub trait Hex {
     type Err;
+    /// Represent a value as a hex string
     fn to_hex(&self) -> String;
-    fn from_hex(_: &str) -> Result<Self, Self::Err> where Self: Sized;
+    /// Convert a hex string to a value
+    fn from_hex(_: &str) -> Result<Self, Self::Err>
+    where
+        Self: Sized;
 }
 
 impl Hex for u8 {

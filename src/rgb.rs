@@ -4,16 +4,71 @@ use {
     std::fmt,
 };
 
-#[derive(Clone, Copy, Deserialize, Debug, PartialEq, Serialize)]
+/// Represents a color as red, green and blue channels with no transparency
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct RGB<T>
-where T: ColorChannel + Copy + PartialOrd {
-    red: T,
-    green: T,
-    blue: T,
+where
+    T: ColorChannel,
+{
+    pub red: T,
+    pub green: T,
+    pub blue: T,
+}
+
+impl<T> RGB<T>
+where
+    T: ColorChannel,
+{
+    /// Creates a new instance
+    ///
+    /// # Errors
+    /// Returns `ColorError::OutsideBoundsNegative` if any channel is less than `ColorChannel::MIN`
+    /// Returns `ColorError::OutsideBoundsHigh` if any channel is greater than `ColorChannel::MAX`
+    pub fn try_new(red: T, green: T, blue: T) -> Result<Self, ColorError> {
+        for c in [red, green, blue] {
+            if c < ColorChannel::MIN {
+                return Err(ColorError::OutsideBoundsNegative);
+            } else if c > ColorChannel::MAX {
+                return Err(ColorError::OutsideBoundsHigh);
+            }
+        }
+        Ok(Self { red, green, blue })
+    }
+
+    /// Creates a new instance infallibly. If any of the arguments are outside of
+    /// the bounds `ColorChannel::MIN` and `ColorChannel::MAX`, that channels value
+    /// will be either the minimum or the maximum, respectively.
+    pub fn new(red: T, green: T, blue: T) -> Self {
+        Self {
+            red: if red < ColorChannel::MIN {
+                ColorChannel::MIN
+            } else if red > ColorChannel::MAX {
+                ColorChannel::MAX
+            } else {
+                red
+            },
+            green: if green < ColorChannel::MIN {
+                ColorChannel::MIN
+            } else if green > ColorChannel::MAX {
+                ColorChannel::MAX
+            } else {
+                green
+            },
+            blue: if blue < ColorChannel::MIN {
+                ColorChannel::MIN
+            } else if blue > ColorChannel::MAX {
+                ColorChannel::MAX
+            } else {
+                blue
+            },
+        }
+    }
 }
 
 impl<T> fmt::Display for RGB<T>
-where T: ColorChannel + Copy + PartialOrd {
+where
+    T: ColorChannel,
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -26,7 +81,9 @@ where T: ColorChannel + Copy + PartialOrd {
 }
 
 impl<T> Primary for RGB<T>
-where T: ColorChannel + Copy + PartialOrd {
+where
+    T: ColorChannel,
+{
     fn primary(color: PrimaryColor) -> Self {
         Self {
             red: match color {
@@ -46,7 +103,9 @@ where T: ColorChannel + Copy + PartialOrd {
 }
 
 impl<T> Hex for RGB<T>
-where T: ColorChannel + Hex + Copy + PartialOrd {
+where
+    T: ColorChannel + Hex,
+{
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
@@ -79,10 +138,6 @@ where T: ColorChannel + Hex + Copy + PartialOrd {
                 return Err(ColorError::OutsideBoundsHigh);
             }
         }
-        Ok(Self {
-            red,
-            green,
-            blue,
-        })
+        Ok(Self { red, green, blue })
     }
 }

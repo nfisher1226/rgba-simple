@@ -12,5 +12,6 @@ pub enum PrimaryColor {
 
 /// Initializes the color storage type with the specified color
 pub trait Primary {
+    /// Initializes the color storage type with the specified color
     fn primary(color: PrimaryColor) -> Self;
 }
