@@ -1,5 +1,6 @@
+#[allow(clippy::enum_glob_use)]
 use {
-    crate::{ColorChannel, ColorError, Hex, Primary, PrimaryColor, PrimaryColor::*},
+    crate::{Channel, ColorError, Hex, Primary, PrimaryColor, PrimaryColor::*},
     serde::{Deserialize, Serialize},
     std::fmt,
 };
@@ -8,7 +9,7 @@ use {
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
 pub struct RGB<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     pub red: T,
     pub green: T,
@@ -17,7 +18,7 @@ where
 
 impl<T> RGB<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     /// Creates a new instance
     ///
@@ -26,9 +27,9 @@ where
     /// Returns `ColorError::OutsideBoundsHigh` if any channel is greater than `ColorChannel::MAX`
     pub fn try_new(red: T, green: T, blue: T) -> Result<Self, ColorError> {
         for c in [red, green, blue] {
-            if c < ColorChannel::MIN {
+            if c < Channel::MIN {
                 return Err(ColorError::OutsideBoundsNegative);
-            } else if c > ColorChannel::MAX {
+            } else if c > Channel::MAX {
                 return Err(ColorError::OutsideBoundsHigh);
             }
         }
@@ -40,24 +41,24 @@ where
     /// will be either the minimum or the maximum, respectively.
     pub fn new(red: T, green: T, blue: T) -> Self {
         Self {
-            red: if red < ColorChannel::MIN {
-                ColorChannel::MIN
-            } else if red > ColorChannel::MAX {
-                ColorChannel::MAX
+            red: if red < Channel::MIN {
+                Channel::MIN
+            } else if red > Channel::MAX {
+                Channel::MAX
             } else {
                 red
             },
-            green: if green < ColorChannel::MIN {
-                ColorChannel::MIN
-            } else if green > ColorChannel::MAX {
-                ColorChannel::MAX
+            green: if green < Channel::MIN {
+                Channel::MIN
+            } else if green > Channel::MAX {
+                Channel::MAX
             } else {
                 green
             },
-            blue: if blue < ColorChannel::MIN {
-                ColorChannel::MIN
-            } else if blue > ColorChannel::MAX {
-                ColorChannel::MAX
+            blue: if blue < Channel::MIN {
+                Channel::MIN
+            } else if blue > Channel::MAX {
+                Channel::MAX
             } else {
                 blue
             },
@@ -67,7 +68,7 @@ where
 
 impl<T> fmt::Display for RGB<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -82,21 +83,21 @@ where
 
 impl<T> Primary for RGB<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     fn primary(color: PrimaryColor) -> Self {
         Self {
             red: match color {
-                Black | Green | Blue | Cyan => ColorChannel::MIN,
-                _ => ColorChannel::MAX,
+                Black | Green | Blue | Cyan => Channel::MIN,
+                _ => Channel::MAX,
             },
             green: match color {
-                Black | Red | Blue | Magenta => ColorChannel::MIN,
-                _ => ColorChannel::MAX,
+                Black | Red | Blue | Magenta => Channel::MIN,
+                _ => Channel::MAX,
             },
             blue: match color {
-                Black | Red | Green | Yellow => ColorChannel::MIN,
-                _ => ColorChannel::MAX,
+                Black | Red | Green | Yellow => Channel::MIN,
+                _ => Channel::MAX,
             },
         }
     }
@@ -104,7 +105,7 @@ where
 
 impl<T> Hex for RGB<T>
 where
-    T: ColorChannel + Hex,
+    T: Channel + Hex,
 {
     type Err = ColorError;
 
@@ -132,9 +133,9 @@ where
             Err(_) => return Err(ColorError::InvalidHexCharacter),
         };
         for channel in [red, green, blue] {
-            if channel < ColorChannel::MIN {
+            if channel < Channel::MIN {
                 return Err(ColorError::OutsideBoundsNegative);
-            } else if channel > ColorChannel::MAX {
+            } else if channel > Channel::MAX {
                 return Err(ColorError::OutsideBoundsHigh);
             }
         }

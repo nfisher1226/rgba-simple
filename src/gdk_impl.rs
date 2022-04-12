@@ -1,4 +1,4 @@
-use crate::{ColorChannel, ColorError, Hex, RGB, RGBA, Primary, PrimaryColor, PrimaryColor::*};
+use crate::{Channel, ColorError, Hex, Primary, PrimaryColor, PrimaryColor::*, RGB, RGBA};
 
 /// Convert to the `gdk::RGBA` color representation
 pub trait ToGdk {
@@ -12,7 +12,7 @@ pub trait FromGdk {
 
 impl<T> ToGdk for RGB<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     fn to_gdk(&self) -> gdk::RGBA {
         gdk::builders::RGBABuilder::new()
@@ -26,7 +26,7 @@ where
 
 impl<T> ToGdk for RGBA<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     fn to_gdk(&self) -> gdk::RGBA {
         gdk::builders::RGBABuilder::new()
@@ -40,7 +40,7 @@ where
 
 impl<T> FromGdk for RGB<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     fn from_gdk(color: gdk::RGBA) -> Self {
         Self {
@@ -53,7 +53,7 @@ where
 
 impl<T> FromGdk for RGBA<T>
 where
-    T: ColorChannel,
+    T: Channel,
 {
     fn from_gdk(color: gdk::RGBA) -> Self {
         Self {
@@ -103,8 +103,7 @@ impl Hex for gdk::RGBA {
             .green(green)
             .blue(blue)
             .alpha(1.0)
-            .build()
-        )
+            .build())
     }
 }
 

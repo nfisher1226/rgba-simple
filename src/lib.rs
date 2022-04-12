@@ -1,3 +1,7 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::cast_precision_loss)]
 //! `Rgba_simple` is a small library for storing colors in RGBA and Hex notation.
 //! It includes functions to convert to and from Hex and RGBA. All of the internal
 //! formats can be serialized and deserialized with `serde`. If compiled with the
@@ -19,7 +23,7 @@
 //!```
 
 pub(crate) mod channel;
-pub(crate) use channel::ColorChannel;
+pub(crate) use channel::Channel;
 mod colorerror;
 pub use colorerror::ColorError;
 mod hex;

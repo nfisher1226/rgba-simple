@@ -1,5 +1,5 @@
 /// Required trait for a type to be able to represent a color channel
-pub trait ColorChannel: Copy + PartialOrd {
+pub trait Channel: Copy + PartialOrd {
     const MAX: Self;
     const MIN: Self;
 
@@ -8,7 +8,7 @@ pub trait ColorChannel: Copy + PartialOrd {
     fn to_percent(&self) -> f32;
 }
 
-impl ColorChannel for u8 {
+impl Channel for u8 {
     const MAX: Self = 255;
     const MIN: Self = 0;
 
@@ -21,11 +21,11 @@ impl ColorChannel for u8 {
     }
 
     fn to_percent(&self) -> f32 {
-        *self as f32 / 255.0
+        f32::from(*self) / 255.0
     }
 }
 
-impl ColorChannel for u16 {
+impl Channel for u16 {
     const MAX: Self = 255;
     const MIN: Self = 0;
 
@@ -38,11 +38,11 @@ impl ColorChannel for u16 {
     }
 
     fn to_percent(&self) -> f32 {
-        *self as f32 / 255.0
+        f32::from(*self) / 255.0
     }
 }
 
-impl ColorChannel for u32 {
+impl Channel for u32 {
     const MAX: Self = 255;
     const MIN: Self = 0;
 
@@ -59,7 +59,7 @@ impl ColorChannel for u32 {
     }
 }
 
-impl ColorChannel for u64 {
+impl Channel for u64 {
     const MAX: Self = 255;
     const MIN: Self = 0;
 
@@ -76,7 +76,7 @@ impl ColorChannel for u64 {
     }
 }
 
-impl ColorChannel for i16 {
+impl Channel for i16 {
     const MAX: Self = 255;
     const MIN: Self = 0;
 
@@ -89,11 +89,11 @@ impl ColorChannel for i16 {
     }
 
     fn to_percent(&self) -> f32 {
-        *self as f32 / 255.0
+        f32::from(*self) / 255.0
     }
 }
 
-impl ColorChannel for i32 {
+impl Channel for i32 {
     const MAX: Self = 255;
     const MIN: Self = 0;
 
@@ -110,7 +110,7 @@ impl ColorChannel for i32 {
     }
 }
 
-impl ColorChannel for i64 {
+impl Channel for i64 {
     const MAX: Self = 255;
     const MIN: Self = 0;
 
@@ -127,7 +127,7 @@ impl ColorChannel for i64 {
     }
 }
 
-impl ColorChannel for f32 {
+impl Channel for f32 {
     const MAX: Self = 1.0;
     const MIN: Self = 0.0;
 
@@ -144,7 +144,7 @@ impl ColorChannel for f32 {
     }
 }
 
-impl ColorChannel for f64 {
+impl Channel for f64 {
     const MAX: Self = 1.0;
     const MIN: Self = 0.0;
 
@@ -153,7 +153,7 @@ impl ColorChannel for f64 {
     }
 
     fn from_percent(percent: f32) -> Self {
-        percent as f64
+        f64::from(percent)
     }
 
     fn to_percent(&self) -> f32 {

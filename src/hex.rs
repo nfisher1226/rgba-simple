@@ -18,6 +18,9 @@ pub trait Hex {
     /// Represent a value as a hex string
     fn to_hex(&self) -> String;
     /// Convert a hex string to a value
+    ///
+    /// # Errors
+    /// Returns error if the hex string is not valid or value is out of bounds
     fn from_hex(_: &str) -> Result<Self, Self::Err>
     where
         Self: Sized;
@@ -145,7 +148,7 @@ impl Hex for f32 {
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
         match u8::from_str_radix(hex, 16) {
-            Ok(c) => Ok(c as f32 / 255.0),
+            Ok(c) => Ok(f32::from(c) / 255.0),
             Err(_) => Err(ColorError::InvalidHexCharacter),
         }
     }
@@ -161,7 +164,7 @@ impl Hex for f64 {
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
         match u8::from_str_radix(hex, 16) {
-            Ok(c) => Ok(c as f64 / 255.0),
+            Ok(c) => Ok(f64::from(c) / 255.0),
             Err(_) => Err(ColorError::InvalidHexCharacter),
         }
     }
