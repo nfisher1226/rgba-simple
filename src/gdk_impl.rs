@@ -1,3 +1,4 @@
+#![allow(clippy::enum_glob_use)]
 use crate::{Channel, ColorError, Hex, Primary, PrimaryColor, PrimaryColor::*, RGB, RGBA};
 
 /// Convert to the `gdk::RGBA` color representation

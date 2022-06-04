@@ -6,7 +6,7 @@ use {
 };
 
 /// Represents a color as red, green and blue channels with no transparency
-#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct RGB<T>
 where
     T: Channel,

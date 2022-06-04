@@ -1,3 +1,4 @@
+#![allow(clippy::module_name_repetitions)]
 /// An enumeration of primary and secondary colors
 pub enum PrimaryColor {
     Black,

@@ -7,7 +7,7 @@ use {
 
 /// Represents a color as red, green and blue channels with an alpha channel
 /// for transparency
-#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct RGBA<T>
 where
     T: Channel,
