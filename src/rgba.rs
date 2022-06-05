@@ -1,6 +1,6 @@
 #[allow(clippy::enum_glob_use)]
 use {
-    crate::{Channel, ColorError, Hex, Primary, PrimaryColor, PrimaryColor::*},
+    crate::{Channel, ColorError, hex, Hex, Primary, PrimaryColor, PrimaryColor::*},
     serde::{Deserialize, Serialize},
     std::fmt,
 };
@@ -135,7 +135,7 @@ where
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
-        crate::hex::validate_hex_string(hex)?;
+        hex::validate_hex_string(hex)?;
         let red = match T::from_hex(&hex[1..3]) {
             Ok(r) => r,
             Err(_) => return Err(ColorError::InvalidHexCharacter),
