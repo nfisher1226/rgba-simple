@@ -4,10 +4,10 @@ pub(crate) fn validate_hex_string(hex: &str) -> Result<(), ColorError> {
     match &hex.len() {
         x if *x < 7 => Err(ColorError::TruncatedHexString),
         x if *x > 7 => Err(ColorError::HexStringOverflow),
-        _ => if &hex[0..1] != "#" {
-            Err(ColorError::InvalidHexCharacter)
-        } else {
+        _ => if &hex[0..1] == "#" {
             Ok(())
+        } else {
+            Err(ColorError::InvalidHexCharacter)
         }
     }
 }
