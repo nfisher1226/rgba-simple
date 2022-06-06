@@ -15,10 +15,17 @@ jobs:
     runs-on: ubuntu-20.04
     container:
       image: ghcr.io/gtk-rs/gtk4-rs/gtk4:latest
+    strategy:
+      matrix:
+        rust:
+          - stable
 
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.rust }}
+        override: true
     - name: Build
       run: cargo build --verbose --all-features
     - name: Run tests
