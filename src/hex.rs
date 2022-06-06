@@ -2,14 +2,14 @@ use crate::ColorError;
 
 pub(crate) fn validate_hex_string(hex: &str) -> Result<(), ColorError> {
     match &hex.len() {
-        x if *x < 7 => return Err(ColorError::TruncatedHexString),
-        x if *x > 7 => return Err(ColorError::HexStringOverflow),
-        _ => {}
-    };
-    if &hex[0..1] != "#" {
-        return Err(ColorError::InvalidHexCharacter);
+        x if *x < 7 => Err(ColorError::TruncatedHexString),
+        x if *x > 7 => Err(ColorError::HexStringOverflow),
+        _ => if &hex[0..1] == "#" {
+            Ok(())
+        } else {
+            Err(ColorError::InvalidHexCharacter)
+        }
     }
-    Ok(())
 }
 
 /// Transformations to and from hexadecimal notation (base 16)
@@ -18,7 +18,6 @@ pub trait Hex {
     /// Represent a value as a hex string
     fn to_hex(&self) -> String;
     /// Convert a hex string to a value
-    ///
     /// # Errors
     /// Returns error if the hex string is not valid or value is out of bounds
     fn from_hex(_: &str) -> Result<Self, Self::Err>
