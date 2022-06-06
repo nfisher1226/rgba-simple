@@ -17,7 +17,7 @@ jobs:
       image: ghcr.io/gtk-rs/gtk4-rs/gtk4:latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Build
       run: cargo build --verbose --all-features
     - name: Run tests
