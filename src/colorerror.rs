@@ -1,4 +1,7 @@
-use std::{error::Error, fmt::{self, Display}};
+use std::{
+    error::Error,
+    fmt::{self, Display},
+};
 
 /// Errors which might occur when validating or converting colors
 #[derive(Clone, Debug, Eq, PartialEq)]

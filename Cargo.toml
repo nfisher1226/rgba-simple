@@ -1,6 +1,6 @@
 [package]
 name = "rgba_simple"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Nathan Fisher <nfisher.sr@gmail.com>"]
 edition = "2021"
 license = "BSD-2-Clause"

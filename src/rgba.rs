@@ -1,6 +1,6 @@
 #[allow(clippy::enum_glob_use)]
 use {
-    crate::{Channel, ColorError, hex, Hex, Primary, PrimaryColor, PrimaryColor::*},
+    crate::{hex, Channel, ColorError, Hex, PrimaryColor, PrimaryColor::*},
     serde::{Deserialize, Serialize},
     std::fmt,
 };
@@ -96,11 +96,11 @@ where
     }
 }
 
-impl<T> Primary for RGBA<T>
+impl<T> From<PrimaryColor> for RGBA<T>
 where
     T: Channel,
 {
-    fn primary(color: PrimaryColor) -> Self {
+    fn from(color: PrimaryColor) -> Self {
         Self {
             red: match color {
                 Black | Green | Blue | Cyan => Channel::MIN,
