@@ -3,7 +3,7 @@
 #![allow(clippy::cast_possible_truncation)]
 #![allow(clippy::cast_precision_loss)]
 #![doc = include_str!("../README.md")]
-pub(crate) mod channel;
+mod channel;
 pub(crate) use channel::Channel;
 mod colorerror;
 pub use colorerror::ColorError;

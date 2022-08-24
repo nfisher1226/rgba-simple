@@ -1,12 +1,15 @@
 #[allow(clippy::enum_glob_use)]
 use {
     crate::{hex, Channel, ColorError, Hex, PrimaryColor, PrimaryColor::*},
-    serde::{Deserialize, Serialize},
     std::fmt,
 };
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 /// Represents a color as red, green and blue channels with no transparency
-#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct RGB<T>
 where
     T: Channel,

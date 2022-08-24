@@ -15,8 +15,9 @@ categories = ["graphics", "multimedia::images"]
 [dependencies]
 
 [dependencies.serde]
-version = "~1.0"
+version = "1.0"
 features = ["derive"]
+optional = true
 
 [dependencies.gdk]
 version = "*"
