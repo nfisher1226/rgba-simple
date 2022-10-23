@@ -13,7 +13,7 @@ impl Channel for u8 {
     const MIN: Self = 0;
 
     fn channel_display(&self) -> String {
-        format!("{}", self)
+        format!("{self}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -30,7 +30,7 @@ impl Channel for u16 {
     const MIN: Self = 0;
 
     fn channel_display(&self) -> String {
-        format!("{}", self)
+        format!("{self}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -47,7 +47,7 @@ impl Channel for u32 {
     const MIN: Self = 0;
 
     fn channel_display(&self) -> String {
-        format!("{}", self)
+        format!("{self}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -64,7 +64,7 @@ impl Channel for u64 {
     const MIN: Self = 0;
 
     fn channel_display(&self) -> String {
-        format!("{}", self)
+        format!("{self}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -81,7 +81,7 @@ impl Channel for i16 {
     const MIN: Self = 0;
 
     fn channel_display(&self) -> String {
-        format!("{}", self)
+        format!("{self}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -98,7 +98,7 @@ impl Channel for i32 {
     const MIN: Self = 0;
 
     fn channel_display(&self) -> String {
-        format!("{}", self)
+        format!("{self}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -115,7 +115,7 @@ impl Channel for i64 {
     const MIN: Self = 0;
 
     fn channel_display(&self) -> String {
-        format!("{}", self)
+        format!("{self}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -132,7 +132,7 @@ impl Channel for f32 {
     const MIN: Self = 0.0;
 
     fn channel_display(&self) -> String {
-        format!("{:.3}", self)
+        format!("{self:.3}")
     }
 
     fn from_percent(percent: f32) -> Self {
@@ -149,7 +149,7 @@ impl Channel for f64 {
     const MIN: Self = 0.0;
 
     fn channel_display(&self) -> String {
-        format!("{:.3}", self)
+        format!("{self:.3}")
     }
 
     fn from_percent(percent: f32) -> Self {

@@ -1,5 +1,9 @@
 # Contents
-* [0.6.0](0.6.0-release)
+* [Unreleased](#unreleased)
+* [0.6.0](#0.6.0-release)
+
+## Unreleased
+* Make Serde support optional
 
 ## 0.6.0 Release
 Complete rewrite using generics. This should be essentially the stable interface

@@ -32,7 +32,7 @@ impl Hex for u8 {
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
-        format!("{:02x}", self)
+        format!("{self:02x}")
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
@@ -48,7 +48,7 @@ impl Hex for u16 {
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
-        format!("{:02x}", self)
+        format!("{self:02x}")
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
@@ -64,7 +64,7 @@ impl Hex for u32 {
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
-        format!("{:02x}", self)
+        format!("{self:02x}")
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
@@ -80,7 +80,7 @@ impl Hex for u64 {
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
-        format!("{:02x}", self)
+        format!("{self:02x}")
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
@@ -96,7 +96,7 @@ impl Hex for i16 {
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
-        format!("{:02x}", self)
+        format!("{self:02x}")
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
@@ -112,7 +112,7 @@ impl Hex for i32 {
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
-        format!("{:02x}", self)
+        format!("{self:02x}")
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
@@ -128,7 +128,7 @@ impl Hex for i64 {
     type Err = ColorError;
 
     fn to_hex(&self) -> String {
-        format!("{:02x}", self)
+        format!("{self:02x}")
     }
 
     fn from_hex(hex: &str) -> Result<Self, Self::Err> {
