@@ -20,6 +20,6 @@ features = ["derive"]
 optional = true
 
 [dependencies.gdk]
-version = "*"
+version = "0.5"
 package = "gdk4"
 optional = true
